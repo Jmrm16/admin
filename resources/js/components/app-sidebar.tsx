@@ -18,6 +18,12 @@ const mainNavItems: NavItem[] = [
         href: '/usuarios',
         icon: LayoutGrid,
     },
+    {
+        title: 'Formularios Médicos',
+        href: '/formularios-medicos',
+        icon: LayoutGrid, // O puedes usar otro icono más relacionado con salud
+    }
+    
 ];
 
 const footerNavItems: NavItem[] = [
