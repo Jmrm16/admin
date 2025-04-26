@@ -64,7 +64,11 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                                                     size="sm"
                                                     className="bg-red-600 hover:bg-red-500 text-white"
                                                 >
-                                                    <Link href={`/usuarios/${usuario.id}/delete`} method="delete" as="button">
+                                                    <Link 
+                                                        href={`/usuarios/${usuario.id}`} 
+                                                        method="delete" 
+                                                        as="button"
+                                                    >
                                                         Eliminar
                                                     </Link>
                                                 </Button>
@@ -75,7 +79,6 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </AppLayout>

@@ -6,6 +6,13 @@ use App\Models\Usuarios;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Models\FormulariosMedicos;
+
+
+
+use App\Models\User; 
+
+
 class UsuariosController extends Controller
 {
     /**
@@ -18,7 +25,22 @@ class UsuariosController extends Controller
         return Inertia::render('Usuarios/Index', [
             'usuarios' => $usuarios,
         ]);
+    
     }
+
+
+    public function showProfile($id)
+    {
+        $usuario = User::findOrFail($id);
+    
+        $formulariosMedicos = FormulariosMedicos::where('user_id', $usuario->id)->get();
+    
+        return Inertia::render('Usuarios/Profile', [
+            'usuario' => $usuario,
+            'formulariosMedicos' => $formulariosMedicos,
+        ]);
+    }
+
     
 
     /**
