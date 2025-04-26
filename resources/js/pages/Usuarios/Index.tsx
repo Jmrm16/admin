@@ -2,85 +2,123 @@ import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { type BreadcrumbItem } from '@/types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { PlusCircle, Search, MoreHorizontal } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Usuarios',
-        href: '/usuarios',
-    },
+  {
+    title: 'Usuarios',
+    href: '/usuarios',
+  },
 ];
 
 interface UsuariosIndexProps {
-    usuarios: {
-        id: number;
-        name: string;
-        email: string;
-    }[];
+  usuarios: {
+    id: number;
+    name: string;
+    email: string;
+  }[];
 }
 
 export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Usuarios" />
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Usuarios" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min p-4 bg-background dark:bg-black">
-                    <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-2xl font-bold text-white">Lista de Usuarios</h1>
-                        <Button asChild className="bg-primary text-white hover:bg-primary/90">
-                            <Link href="/usuarios/create">Agregar Cliente</Link>
-                        </Button>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full bg-gray-800 text-white border rounded-lg">
-                            <thead className="bg-gray-700 text-gray-300 uppercase text-sm">
-                                <tr>
-                                    <th className="py-3 px-6 text-left">ID</th>
-                                    <th className="py-3 px-6 text-left">Nombre</th>
-                                    <th className="py-3 px-6 text-left">Email</th>
-                                    <th className="py-3 px-6 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-gray-200">
-                                {usuarios.map((usuario) => (
-                                    <tr key={usuario.id} className="border-b border-gray-600 hover:bg-gray-700">
-                                        <td className="py-3 px-6">{usuario.id}</td>
-                                        <td className="py-3 px-6">{usuario.name}</td>
-                                        <td className="py-3 px-6">{usuario.email}</td>
-                                        <td className="py-3 px-6 text-center">
-                                            <div className="flex justify-center space-x-2">
-                                                <Button
-                                                    asChild
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="bg-gray-600 text-white hover:bg-gray-500"
-                                                >
-                                                    <Link href={`/usuarios/${usuario.id}/edit`}>Editar</Link>
-                                                </Button>
-                                                <Button
-                                                    asChild
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="bg-red-600 hover:bg-red-500 text-white"
-                                                >
-                                                    <Link 
-                                                        href={`/usuarios/${usuario.id}`} 
-                                                        method="delete" 
-                                                        as="button"
-                                                    >
-                                                        Eliminar
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+      <div className="container mx-auto py-6">
+        <Card>
+          <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <CardTitle className="text-2xl">Lista de Usuarios</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Administra los usuarios registrados en el sistema
+              </p>
             </div>
-        </AppLayout>
-    );
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar usuarios..."
+                  className="pl-10 w-full"
+                />
+              </div>
+              <Button asChild className="w-full sm:w-auto">
+                <Link href="/usuarios/create">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Agregar Usuario
+                </Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {usuarios.map((usuario) => (
+                    <TableRow key={usuario.id}>
+                      <TableCell className="font-medium">
+                        {usuario.id}
+                      </TableCell>
+                      <TableCell>{usuario.name}</TableCell>
+                      <TableCell>{usuario.email}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Abrir menú</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/usuarios/${usuario.id}/edit`}>
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/usuarios/${usuario.id}`}
+                                method="delete"
+                                as="button"
+                                className="w-full text-left text-destructive"
+                              >
+                                Eliminar
+                              </Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
+  );
 }
