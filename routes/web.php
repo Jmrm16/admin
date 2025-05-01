@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    
     Route::resource('usuarios', UsuariosController::class)->except([]);
 
 

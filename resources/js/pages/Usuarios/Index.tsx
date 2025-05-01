@@ -93,22 +93,25 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/usuarios/${usuario.id}/edit`}>
-                                Editar
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/usuarios/${usuario.id}`}
-                                method="delete"
-                                as="button"
-                                className="w-full text-left text-destructive"
-                              >
-                                Eliminar
-                              </Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
+  <DropdownMenuItem asChild>
+    <Link href={`/usuarios/${usuario.id}`}>Ver Perfil</Link>
+  </DropdownMenuItem>
+  <DropdownMenuItem asChild>
+    <Link href={`/usuarios/${usuario.id}/edit`}>
+      Editar
+    </Link>
+  </DropdownMenuItem>
+  <DropdownMenuItem asChild>
+    <Link
+      href={`/usuarios/${usuario.id}`}
+      method="delete"
+      as="button"
+      className="w-full text-left text-destructive"
+    >
+      Eliminar
+    </Link>
+  </DropdownMenuItem>
+</DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
