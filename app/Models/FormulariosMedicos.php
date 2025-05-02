@@ -13,7 +13,7 @@ class FormulariosMedicos extends Model
     protected $table = 'formularios_medicos';
 
     protected $fillable = [
-        
+        'estado',
         'user_id',
         'fecha',
         'sucursal',
@@ -116,6 +116,7 @@ class FormulariosMedicos extends Model
         'intermediario_in',
         'direccion_in',
         'fondos',
+        
 
     ];
 

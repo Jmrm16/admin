@@ -1,5 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -12,20 +15,21 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, DownloadIcon } from 'lucide-react';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Formulario {
   id: number;
   fecha: string;
-  sucursal: string;
   tipo_solicitud: string;
+  estado: string;
   pdf_path: string;
   created_at: string;
+  sucursal: string;
 }
 
 interface Props {
@@ -37,34 +41,51 @@ interface Props {
   formularios: Formulario[];
 }
 
-export default function Profile({ usuario, formularios }: Props) {
+export default function Profile({ usuario, formularios: initialFormularios }: Props) {
+  const [formularios, setFormularios] = useState<Formulario[]>(initialFormularios);
+
+  const handleChangeEstado = (formularioId: number, nuevoEstado: string) => {
+    axios
+      .post(`/formularios-medicos/${formularioId}/estado`, { estado: nuevoEstado })
+      .then(() => {
+        // Actualizar estado localmente
+        const actualizados = formularios.map((f) =>
+          f.id === formularioId ? { ...f, estado: nuevoEstado } : f
+        );
+        setFormularios(actualizados);
+        toast.success('Estado actualizado correctamente.');
+      })
+      .catch((error) => {
+        console.error('Error al cambiar el estado:', error);
+        toast.error('Error al actualizar el estado.');
+      });
+  };
+
   return (
     <AppLayout>
       <Head title={`Perfil de ${usuario.name}`} />
 
       <div className="container mx-auto py-6">
-        {/* Sección de información del usuario */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">Información del Usuario</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-1">
+            <div>
               <p className="text-sm font-medium text-muted-foreground">Nombre</p>
               <p className="text-sm">{usuario.name}</p>
             </div>
-            <div className="space-y-1">
+            <div>
               <p className="text-sm font-medium text-muted-foreground">Email</p>
               <p className="text-sm">{usuario.email}</p>
             </div>
-            <div className="space-y-1">
+            <div>
               <p className="text-sm font-medium text-muted-foreground">Total Formularios</p>
               <p className="text-sm">{formularios.length}</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Sección de formularios con diseño tabular */}
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Formularios Médicos</CardTitle>
@@ -81,54 +102,49 @@ export default function Profile({ usuario, formularios }: Props) {
                     <TableHead>Sucursal</TableHead>
                     <TableHead>Tipo de Solicitud</TableHead>
                     <TableHead>Fecha de Creación</TableHead>
+                    <TableHead>Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {formularios.map((formulario) => (
                     <TableRow key={formulario.id}>
-                      <TableCell className="font-medium">
-                        {formulario.id}
-                      </TableCell>
+                      <TableCell className="font-medium">{formulario.id}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{formulario.sucursal}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
-                          {formulario.tipo_solicitud}
-                        </Badge>
+                        <Badge variant="secondary">{formulario.tipo_solicitud}</Badge>
                       </TableCell>
                       <TableCell>
                         {new Date(formulario.created_at).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/formularios-medicos/${formulario.id}`}>
-                                Ver Detalle
-                              </Link>
-                            </DropdownMenuItem>
-                            {formulario.pdf_path && (
-                              <DropdownMenuItem asChild>
-                                <a 
-                                  href={formulario.pdf_path} 
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="w-full"
-                                >
-                                  <DownloadIcon className="mr-2 h-4 w-4" />
-                                  Descargar PDF
-                                </a>
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <TableCell>
+                        <Badge variant="outline">{formulario.estado}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Select
+                          value={formulario.estado}
+                          onValueChange={(estado) =>
+                            handleChangeEstado(formulario.id, estado)
+                          }
+                        >
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue placeholder="Cambiar Estado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pendiente">Pendiente</SelectItem>
+                            <SelectItem value="en_revisión">En Revisión</SelectItem>
+                            <SelectItem value="aprobado">Aprobado</SelectItem>
+                            <SelectItem value="rechazado">Rechazado</SelectItem>
+                            <SelectItem value="finalizado">Finalizado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Link href={`/formularios-medicos/${formulario.id}`} className="ml-2">
+                          <Button size="sm" variant="outline">
+                            Detalles
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}

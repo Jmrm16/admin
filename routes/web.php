@@ -22,6 +22,9 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
     Route::resource('usuarios', UsuariosController::class)->except([]);
+  
+Route::post('/formularios-medicos/{id}/estado', [UsuariosController::class, 'cambiarEstado'])->name('formularios.cambiarEstado');
+
 
 
 Route::get('/formularios-medicos/{id}', function ($id) {

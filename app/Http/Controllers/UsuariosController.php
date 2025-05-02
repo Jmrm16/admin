@@ -29,7 +29,7 @@ class UsuariosController extends Controller
         $usuario = User::with(['formulariosMedicos' => function($query) {
             $query->select([
                 'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud', 
-                'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path',
+                'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
                 'created_at'
             ])->latest();
         }])->findOrFail($id);
@@ -39,6 +39,19 @@ class UsuariosController extends Controller
             'formularios' => $usuario->formulariosMedicos
         ]);
     }
+    public function cambiarEstado(Request $request, $id)
+    {
+        $request->validate([
+            'estado' => 'required|in:pendiente,en_revisión,aprobado,rechazado,finalizado',
+        ]);
+    
+        $formulario = FormulariosMedicos::findOrFail($id);
+        $formulario->estado = $request->estado;
+        $formulario->save();
+    
+        return response()->json(['message' => 'Estado actualizado exitosamente']);
+    }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -108,4 +121,8 @@ class UsuariosController extends Controller
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente');
     }
+
+
+
+
 }

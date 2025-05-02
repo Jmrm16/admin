@@ -9,6 +9,7 @@ import { JSX } from 'react/jsx-runtime';
 import React from 'react';
 
 interface Formulario {
+    estado: string;
     id: number;
     user_id: number;
     fecha: string;
@@ -147,7 +148,10 @@ export default function FormularioShow({ formulario }: Props) {
                 { label: "Clase de Vinculación", value: formulario.clase_vinculacion },
                 { label: "Sector de Actividad", value: formulario.sector_actividad },
                 { label: "Cual", value: formulario.cual },
-                { label: "Persona PEP", value: formulario.persona_pep, type: "badge" }
+                { label: "Persona PEP", value: formulario.persona_pep, type: "badge" },
+                { label: "Estado", value: formulario.estado },
+
+
             ]
         },
         {
