@@ -1,8 +1,9 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -11,7 +12,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Bell, BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -40,6 +41,41 @@ const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
+}
+
+function NotificationDropdown() {
+    const notifications = [
+        { id: 1, text: 'Nuevo mensaje recibido' },
+        { id: 2, text: 'Actualización del sistema' },
+    ];
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                    <Bell className="size-5" />
+                    {notifications.length > 0 && (
+                        <Badge className="absolute -right-1 -top-1 h-4 w-4 p-0 text-xs">
+                            {notifications.length}
+                        </Badge>
+                    )}
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+                {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                        <DropdownMenuItem key={notification.id} className="cursor-pointer">
+                            {notification.text}
+                        </DropdownMenuItem>
+                    ))
+                ) : (
+                    <DropdownMenuItem className="text-muted-foreground cursor-pointer">
+                        No hay notificaciones
+                    </DropdownMenuItem>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
@@ -152,6 +188,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Componente de Notificaciones */}
+                        <NotificationDropdown />
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="size-10 rounded-full p-1">

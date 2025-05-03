@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -271,6 +271,13 @@ export default function FormularioShow({ formulario }: Props) {
                         </p>
                     </div>
                     <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+  <Link href={`/documentos/${formulario.user_id}`}>
+    <DownloadIcon className="mr-2 h-4 w-4" />
+    Documentos
+  </Link>
+</Button>
+
                         <Button variant="outline" size="sm" onClick={() => window.open(`/pdf/ver2/${formulario.id}`, '_blank')}>
                             <DownloadIcon className="mr-2 h-4 w-4" />
                             SARLAFT

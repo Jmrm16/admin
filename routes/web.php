@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\DocumentosController;
 
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -23,9 +24,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
     Route::resource('usuarios', UsuariosController::class)->except([]);
   
-Route::post('/formularios-medicos/{id}/estado', [UsuariosController::class, 'cambiarEstado'])->name('formularios.cambiarEstado');
-
-
+    Route::post('/formularios-medicos/{id}/estado', [UsuariosController::class, 'cambiarEstado'])->name('formularios.cambiarEstado');
 
 Route::get('/formularios-medicos/{id}', function ($id) {
     $formulario = FormulariosMedicos::findOrFail($id);
@@ -33,8 +32,16 @@ Route::get('/formularios-medicos/{id}', function ($id) {
 });
 
 
+    // Mostrar todos los documentos de un usuario
+    Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
 
-// Ruta para ver detalles del formulario
+    // Ver documento PDF en el navegador
+    Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
+
+
+    // Descargar documento PDF
+    Route::get('/documentos/descargar/{id}', [DocumentosController::class, 'descargar'])->name('documentos.descargar');
+
 
 
 // Ruta para ver el PDF del formulario
