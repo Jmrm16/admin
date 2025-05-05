@@ -27,5 +27,26 @@ class FormularioMedicoController extends Controller
             'formulario' => $formularioMedico->load('user'),
         ]);
     }
+
+    
+
+
+    public function iniciarTramite($id)
+{
+    $formulario = FormulariosMedicos::findOrFail($id);
+
+    // Verifica si ya hay un administrador asignado
+    if ($formulario->admin_id) {
+        return redirect()->back()->with('error', 'Este formulario ya tiene un administrador asignado.');
+    }
+
+    // Asigna el administrador actual
+    $formulario->admin_id = auth()->id();
+    $formulario->estado = 'en_tramite'; // Puedes definir los estados según tu lógica
+    $formulario->save();
+
+    return redirect()->route('formularios.show', $formulario->id)->with('success', 'Trámite iniciado exitosamente.');
+}
+
     
 }

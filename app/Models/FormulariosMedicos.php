@@ -139,4 +139,10 @@ class FormulariosMedicos extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function administrador()
+    {
+     return $this->belongsTo(User::class, 'admin_id');
+    }
+
 }

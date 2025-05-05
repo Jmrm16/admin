@@ -147,6 +147,12 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                             Detalles
                           </Button>
                         </Link>
+                        <Link href={`/formularios-medicos/${formulario.id}`} className="ml-2">
+                        <Button size="sm" variant="outline">
+                          asignar
+                        </Button>
+                      </Link>
+
                       </TableCell>
                     </TableRow>
                   ))}

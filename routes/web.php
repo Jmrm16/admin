@@ -48,7 +48,7 @@ Route::get('pdf/ver2/{id}', [PDFController::class, 'llenarPDF2']);
 Route::get('pdf/ver/{id}', [PDFController::class, 'verPDF']);
 
 
-
+Route::post('/formularios-medicos/{id}/iniciar-tramite', [FormularioMedicoController::class, 'iniciarTramite'])->name('formularios.iniciarTramite');
 
 
 
