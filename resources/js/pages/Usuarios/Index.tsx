@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { PlusCircle, Search, MoreHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -35,14 +36,34 @@ interface UsuariosIndexProps {
   }[];
 }
 
+
+const MotionCard = motion(Card);
+const MotionCardHeader = motion(CardHeader);
+const MotionCardContent = motion(CardContent);
+const MotionTableRow = motion(TableRow);
+
 export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Usuarios" />
 
-      <div className="container mx-auto py-6">
-        <Card>
-          <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <motion.div
+        className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <MotionCard
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <MotionCardHeader
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
             <div>
               <CardTitle className="text-2xl">Lista de Usuarios</CardTitle>
               <p className="text-sm text-muted-foreground">
@@ -64,8 +85,12 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                 </Link>
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
+          </MotionCardHeader>
+          <MotionCardContent
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -78,7 +103,12 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                 </TableHeader>
                 <TableBody>
                   {usuarios.map((usuario) => (
-                    <TableRow key={usuario.id}>
+                    <MotionTableRow
+                      key={usuario.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * usuario.id }}
+                    >
                       <TableCell className="font-medium">
                         {usuario.id}
                       </TableCell>
@@ -93,35 +123,37 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-  <DropdownMenuItem asChild>
-    <Link href={`/usuarios/${usuario.id}`}>Ver Perfil</Link>
-  </DropdownMenuItem>
-  <DropdownMenuItem asChild>
-    <Link href={`/usuarios/${usuario.id}/edit`}>
-      Editar
-    </Link>
-  </DropdownMenuItem>
-  <DropdownMenuItem asChild>
-    <Link
-      href={`/usuarios/${usuario.id}`}
-      method="delete"
-      as="button"
-      className="w-full text-left text-destructive"
-    >
-      Eliminar
-    </Link>
-  </DropdownMenuItem>
-</DropdownMenuContent>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/usuarios/${usuario.id}`}>
+                                Ver Perfil
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/usuarios/${usuario.id}/edit`}>
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/usuarios/${usuario.id}`}
+                                method="delete"
+                                as="button"
+                                className="w-full text-left text-destructive"
+                              >
+                                Eliminar
+                              </Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
-                    </TableRow>
+                    </MotionTableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </MotionCardContent>
+        </MotionCard>
+      </motion.div>
     </AppLayout>
   );
 }

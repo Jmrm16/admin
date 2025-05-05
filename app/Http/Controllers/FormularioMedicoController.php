@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FormulariosMedicos;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Documentos;
 
 class FormularioMedicoController extends Controller
 {
@@ -16,10 +17,12 @@ class FormularioMedicoController extends Controller
         return Inertia::render('FormulariosMedicos/Index', [
             'formularios' => $formularios,
         ]);
+
     }
 
     public function show(FormulariosMedicos $formularioMedico)
     {
+        
         return Inertia::render('FormulariosMedicos/Show', [
             'formulario' => $formularioMedico->load('user'),
         ]);

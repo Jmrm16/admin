@@ -64,8 +64,8 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
   return (
     <AppLayout>
       <Head title={`Perfil de ${usuario.name}`} />
-
-      <div className="container mx-auto py-6">
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+      
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">Información del Usuario</CardTitle>
@@ -99,9 +99,9 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Sucursal</TableHead>
-                    <TableHead>Tipo de Solicitud</TableHead>
                     <TableHead>Fecha de Creación</TableHead>
+                    <TableHead>Proceso</TableHead>
+                    <TableHead>Tipo de Solicitud</TableHead>                    
                     <TableHead>Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
@@ -111,13 +111,13 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                     <TableRow key={formulario.id}>
                       <TableCell className="font-medium">{formulario.id}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{formulario.sucursal}</Badge>
+                        {new Date(formulario.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{formulario.tipo_solicitud}</Badge>
                       </TableCell>
                       <TableCell>
-                        {new Date(formulario.created_at).toLocaleDateString()}
+                        <Badge variant="secondary">{formulario.tipo_solicitud}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{formulario.estado}</Badge>
@@ -134,10 +134,12 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="pendiente">Pendiente</SelectItem>
-                            <SelectItem value="en_revisión">En Revisión</SelectItem>
-                            <SelectItem value="aprobado">Aprobado</SelectItem>
-                            <SelectItem value="rechazado">Rechazado</SelectItem>
+                            <SelectItem value="revisión">En Revisión</SelectItem>
+                            <SelectItem value="proceso_pago">Aprobado</SelectItem>
+                            <SelectItem value="constancia_pago">Rechazado</SelectItem>
+                            <SelectItem value="poliza">poliza</SelectItem>
                             <SelectItem value="finalizado">Finalizado</SelectItem>
+                            
                           </SelectContent>
                         </Select>
                         <Link href={`/formularios-medicos/${formulario.id}`} className="ml-2">

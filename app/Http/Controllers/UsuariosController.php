@@ -42,7 +42,7 @@ class UsuariosController extends Controller
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
-            'estado' => 'required|in:pendiente,en_revisión,aprobado,rechazado,finalizado',
+            'estado' => 'required|in:pendiente,revision,proceso_pago,constancia_pago,poliza,finalizado',
         ]);
     
         $formulario = FormulariosMedicos::findOrFail($id);

@@ -35,8 +35,7 @@ Route::get('/formularios-medicos/{id}', function ($id) {
     // Mostrar todos los documentos de un usuario
     Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
 
-    // Ver documento PDF en el navegador
-    Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
+
 
 
     // Descargar documento PDF
