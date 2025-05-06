@@ -41,6 +41,7 @@ interface Formulario {
     subido_en: string;
   }[];
   pdf_path: string;
+  admin?: { name: string }; // Added admin property
 }
 
 export default function FormularioShow({ formulario }: { formulario: Formulario }) {
@@ -109,6 +110,9 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
             <p className="text-muted-foreground">
               {formulario.primer_apellido} {formulario.segundo_apellido} {formulario.nombres}
             </p>
+            <p className="text-sm text-muted-foreground">
+  Administrador: {formulario.admin?.name || 'No disponible'}
+</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>

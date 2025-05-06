@@ -26,14 +26,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
   
     Route::post('/formularios-medicos/{id}/estado', [UsuariosController::class, 'cambiarEstado'])->name('formularios.cambiarEstado');
 
-Route::get('/formularios-medicos/{id}', function ($id) {
-    $formulario = FormulariosMedicos::findOrFail($id);
-    return inertia('FormulariosMedicos/Show', ['formulario' => $formulario]);
-});
+    Route::get('/formularios-medicos/{formularioMedico}', [FormularioMedicoController::class, 'show'])->name('formularios-medicos.show');
 
 
     // Mostrar todos los documentos de un usuario
     Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
+
+    Route::get('/formularios-medicos', [FormularioMedicoController::class, 'index'])->name('formularios.index');
+    Route::get('/formularios-medicos/{id}', [FormularioMedicoController::class, 'show'])->name('formularios.show');
 
 
 
@@ -64,7 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    Route::resource('formularios-medicos', FormularioMedicoController::class)->only(['index', 'show']);
+
 });
 
 

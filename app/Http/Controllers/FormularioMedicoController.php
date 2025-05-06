@@ -6,47 +6,37 @@ use App\Models\FormulariosMedicos;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Documentos;
+use Illuminate\Support\Facades\Auth;
+
 
 class FormularioMedicoController extends Controller
 {
     public function index()
     {
-        $formularios = FormulariosMedicos::with('user')->latest()->get();
-        dd($formularios);
-
+        // Puedes usar paginación o obtener todos los formularios
+        $formularios = FormulariosMedicos::with('admin')->paginate(10); // Paginación
+    
         return Inertia::render('FormulariosMedicos/Index', [
             'formularios' => $formularios,
         ]);
-
     }
 
     public function show(FormulariosMedicos $formularioMedico)
     {
-        
+        // Solo asigna si aún no tiene un admin asignado
+        if (is_null($formularioMedico->admin_id)) {
+            $formularioMedico->admin_id = Auth::id();
+            $formularioMedico->save();
+        }
+    
         return Inertia::render('FormulariosMedicos/Show', [
-            'formulario' => $formularioMedico->load('user'),
+            'formulario' => $formularioMedico->load('user', 'admin'),
         ]);
     }
-
     
 
 
-    public function iniciarTramite($id)
-{
-    $formulario = FormulariosMedicos::findOrFail($id);
 
-    // Verifica si ya hay un administrador asignado
-    if ($formulario->admin_id) {
-        return redirect()->back()->with('error', 'Este formulario ya tiene un administrador asignado.');
-    }
-
-    // Asigna el administrador actual
-    $formulario->admin_id = auth()->id();
-    $formulario->estado = 'en_tramite'; // Puedes definir los estados según tu lógica
-    $formulario->save();
-
-    return redirect()->route('formularios.show', $formulario->id)->with('success', 'Trámite iniciado exitosamente.');
-}
 
     
 }

@@ -1,142 +1,86 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'; // Adjusted path to match the correct location of the table component
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, PlusCircle, Search } from 'lucide-react';
+import { type BreadcrumbItem } from '@/types';
 
 interface Formulario {
   id: number;
-  fecha: string;
-  sucursal: string;
-  tipo_solicitud: string;
-  user: {
-    name: string;
-    email: string;
-  };
+  primer_apellido: string;
+  segundo_apellido: string;
+  nombres: string;
+  estado: string;
+  admin: { name: string };
 }
 
-interface Props {
-  formularios: Formulario[];
-}
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: 'Formularios Médicos',
+    href: '/formularios-medicos',
+  },
+];
 
-export default function FormulariosIndex({ formularios }: Props) {
+export default function FormulariosIndex({ formularios }: { formularios: any }) {
+  const formulariosData = Array.isArray(formularios?.data)
+    ? formularios.data.filter((f: any) => f.id != null)
+    : [];
+
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Formularios Médicos" />
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+       
 
-      <div className="container mx-auto py-6">
-        <Card>
-          <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <CardTitle className="text-2xl">Formularios Médicos</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Listado completo de formularios médicos registrados
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar formularios..."
-                  className="pl-10 w-full"
-                />
-              </div>
-              <Button asChild className="w-full sm:w-auto">
-                <Link href="/formularios-medicos/create">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Nuevo Formulario
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Sucursal</TableHead>
-                    <TableHead>Tipo de Solicitud</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+        <div className=" relative flex-1 overflow-hidden rounded-xl border p-4">
+          <div className="relative z-10">
+            <h1 className="text-2xl font-bold mb-4">Listado de Formularios Médicos</h1>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre del Paciente</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Administrador</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {formulariosData.map((formulario: Formulario) => (
+                  <TableRow key={formulario.id}>
+                    <TableCell>{formulario.primer_apellido} {formulario.segundo_apellido} {formulario.nombres}</TableCell>
+                    <TableCell>
+                      <Badge variant={formulario.estado === 'finalizado' ? 'default' : 'secondary'}>
+                        {formulario.estado}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formulario.admin?.name || 'No disponible'}</TableCell>
+                    <TableCell>
+                      <Link href={`/formularios-medicos/${formulario.id}`}>
+                        <Button variant="outline" size="sm">Ver detalles</Button>
+                      </Link>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {formularios.map((formulario) => (
-                    <TableRow key={formulario.id}>
-                      <TableCell className="font-medium">
-                        {formulario.id}
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">
-                          {formulario.user?.name ?? 'N/A'}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formulario.user?.email ?? ''}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{formulario.sucursal}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">
-                          {formulario.tipo_solicitud}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {formulario.fecha
-                          ? new Date(formulario.fecha).toLocaleDateString()
-                          : ''}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/formularios-medicos/${formulario.id}`}
-                              >
-                                Ver Detalle
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/formularios-medicos/${formulario.id}/edit`}
-                              >
-                                Editar
-                              </Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </TableBody>
+            </Table>
+
+            {formularios.links && (
+              <div className="mt-4 flex justify-center space-x-2">
+                {formularios.links.map((link: any) => (
+                  <Link
+                    key={link.url ?? link.label}
+                    href={link.url ?? '#'}
+                    className="text-sm"
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <PlaceholderPattern className="absolute inset-0 size-full " />
+        </div>
       </div>
     </AppLayout>
   );

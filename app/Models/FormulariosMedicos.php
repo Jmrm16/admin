@@ -116,6 +116,7 @@ class FormulariosMedicos extends Model
         'intermediario_in',
         'direccion_in',
         'fondos',
+        'admin_id',
         
 
     ];
@@ -140,7 +141,7 @@ class FormulariosMedicos extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function administrador()
+    public function admin()
     {
      return $this->belongsTo(User::class, 'admin_id');
     }
