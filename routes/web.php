@@ -53,6 +53,7 @@ Route::post('/formularios-medicos/{id}/iniciar-tramite', [FormularioMedicoContro
 
 
 
+
 });
 
 // Rutas del dashboard accesibles para cualquier usuario autenticado

@@ -132,6 +132,7 @@ class FormulariosMedicos extends Model
         'fecha_graduacion' => 'date',
         'fecha' => 'date',
         'vigencia_poliza' => 'date',
+        
     
     ];
 
@@ -145,5 +146,11 @@ class FormulariosMedicos extends Model
     {
      return $this->belongsTo(User::class, 'admin_id');
     }
+
+    public function observaciones()
+{
+    return $this->hasMany(Observacion::class, 'formulario_medico_id');
+}
+
 
 }
