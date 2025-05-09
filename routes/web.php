@@ -8,6 +8,7 @@ use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\FormularioMedicoController;
+use App\Http\Controllers\ObservacionesController;
 use App\Models\FormulariosMedicos;
 
 // REGISTRAR EL MIDDLEWARE AQUÍ
@@ -51,7 +52,8 @@ Route::get('pdf/ver/{id}', [PDFController::class, 'verPDF']);
 Route::post('/formularios-medicos/{id}/iniciar-tramite', [FormularioMedicoController::class, 'iniciarTramite'])->name('formularios.iniciarTramite');
 
 
-
+Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController::class, 'store'])
+    ->name('observaciones.store');
 
 
 });

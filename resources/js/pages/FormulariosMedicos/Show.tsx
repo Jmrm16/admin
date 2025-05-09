@@ -62,16 +62,24 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
     if (!nuevaObservacion.trim()) return;
 
     try {
-      await axios.post(`/formularios-medicos/${formulario.id}/observaciones`, {
+      const response = await axios.post(`/formularios-medicos/${formulario.id}/observaciones`, {
         fase,
         contenido: nuevaObservacion,
       });
-
+    
+      const nueva = response.data.observacion;
+    
+      setFormularioData((prev) => ({
+        ...prev,
+        observaciones: [...prev.observaciones, nueva],
+      }));
+    
       setNuevaObservacion('');
     } catch (error) {
       console.error('Error al agregar la observación:', error);
       alert('Hubo un error al agregar la observación');
     }
+    
   };
 
   const handleCambiarFase = async (nuevaFase: Formulario['fase_actual']) => {
