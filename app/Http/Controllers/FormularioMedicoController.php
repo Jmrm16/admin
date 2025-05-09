@@ -36,10 +36,14 @@ class FormularioMedicoController extends Controller
             $formularioMedico->save();
         }
     
-        return Inertia::render('FormulariosMedicos/Show', [
-            'formulario' => $formularioMedico->load('user'),
-            'formulario' => $formularioMedico->load('user', 'admin'),
+            return Inertia::render('FormulariosMedicos/Show', [
+            'formulario' => $formularioMedico->load([
+                'user',
+                'admin',
+                'observaciones.creadoPor',
+            ]),
         ]);
+
     }
 
 

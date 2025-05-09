@@ -147,10 +147,11 @@ class FormulariosMedicos extends Model
      return $this->belongsTo(User::class, 'admin_id');
     }
 
-    public function observaciones()
+public function observaciones()
 {
-    return $this->hasMany(Observacion::class, 'formulario_medico_id');
+    return $this->hasMany(Observacion::class, 'formulario_medico_id')->latest();
 }
+
 
 
 }

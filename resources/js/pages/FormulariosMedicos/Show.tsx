@@ -21,10 +21,15 @@ interface Observacion {
   id: number;
   fase: string;
   contenido: string;
-  creado_por: { name: string };
-  creado_en: string;
   estado: string;
+  resuelta: boolean;
+  respuesta: string | null;
+  creado_por: {
+    name: string;
+  };
+  creado_en: string;
 }
+
 
 interface Formulario {
   estado: string;
@@ -119,8 +124,8 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
               {formulario.primer_apellido} {formulario.segundo_apellido} {formulario.nombres}
             </p>
             <p className="text-sm text-muted-foreground">
-  Administrador: {formulario.admin?.name || 'No disponible'}
-</p>
+            Administrador: {formulario.admin?.name || 'No disponible'}
+          </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
@@ -215,9 +220,10 @@ function FaseContent({
   setNuevaObservacion: (val: string) => void;
   handleAgregarObservacion: (fase: string) => void;
 }) {
-  const observaciones = (formulario.observaciones || []).filter(
-    (obs) => obs.fase === fase && obs.estado === 'pendiente'
-  );
+ const observaciones = (formulario.observaciones || []).filter(
+  (obs) => obs.fase === fase
+);
+
 
   return (
     <Card>
@@ -232,9 +238,20 @@ function FaseContent({
               <ul className="space-y-2 mt-2">
                 {observaciones.map((obs) => (
                   <li key={obs.id} className="text-sm border p-2 rounded">
-                    <strong>{obs.creado_por.name}</strong>: {obs.contenido}
-                    <br />
+                    <div className="space-y-1">
+                    <p>
+                      <strong>{obs.creado_por.name}</strong>: {obs.contenido}
+                    </p>
                     <span className="text-xs text-muted-foreground">{obs.creado_en}</span>
+
+                    {obs.respuesta && (
+                      <div className="mt-2 px-3 py-2 rounded border border-green-600 bg-green-900 bg-opacity-20 text-sm text-green-200">
+                        <strong className="block text-green-300 mb-1">Respuesta del usuario:</strong>
+                        <p className="m-0">{obs.respuesta}</p>
+                      </div>
+                    )}
+</div>
+
                   </li>
                 ))}
               </ul>
