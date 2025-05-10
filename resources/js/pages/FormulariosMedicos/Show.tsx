@@ -166,7 +166,7 @@ const handleGuardarPago = async () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/documentos/${formulario.user_id}`}>
+              <Link href={`/documentos/${formulario.id}`}>
                 <DownloadIcon className="mr-2 h-4 w-4" />
                 Documentos
               </Link>
@@ -203,62 +203,90 @@ const handleGuardarPago = async () => {
             ))}
           </TabsList>
 
-          {fases.map(fase => (
-            <TabsContent key={fase.id} value={fase.id} className="mt-4">
-              <FaseContent
-                formulario={formularioData}
-                fase={fase.id}
-                nuevaObservacion={nuevaObservacion}
-                setNuevaObservacion={setNuevaObservacion}
-                handleAgregarObservacion={handleAgregarObservacion}
-                acciones={
-                  fase.id === 'pendiente' ? (
-                    <Button onClick={() => handleCambiarFase('revision')}>Iniciar Revisión</Button>
-                  ) : fase.id === 'revision' ? (
-                    <div className="flex gap-2">
-                        
-                      <Button variant="outline">Solicitar Correcciones</Button>
-                      <Button onClick={() => handleCambiarFase('proceso_pago')}>Aprobar y Continuar a Pago</Button>
-                    </div>
-                  ) : fase.id === 'proceso_pago' ? (
-<div className="grid gap-4 md:grid-cols-2">
-  <div className="space-y-2 col-span-2">
-    <label className="block text-sm font-medium">Link de pago</label>
-    <Input
-      type="url"
-      placeholder="https://..."
-      value={linkPago}
-      onChange={(e) => setLinkPago(e.target.value)}
-    />
-    {formularioData.link_pago && (
-      <div className="flex items-center justify-between mt-2">
-        <a
-          href={formularioData.link_pago}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-600 hover:underline"
-        >
-          Ver enlace guardado
-        </a>
-        <span className="text-xs text-muted-foreground">
-          (Se puede editar y volver a guardar)
-        </span>
-      </div>
-    )}
-  </div>
+{fases.map(fase => (
+  <TabsContent key={fase.id} value={fase.id} className="mt-4">
+    {fase.id === 'proceso_pago' ? (
+      // SOLO para proceso_pago
+      <div className="space-y-6">
+        {/* Link de pago arriba */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Link de pago</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Input
+                type="url"
+                placeholder="https://..."
+                value={linkPago}
+                onChange={(e) => setLinkPago(e.target.value)}
+              />
+              {formularioData.link_pago && (
+                <div className="flex items-center justify-between mt-2">
+                  <a
+                    href={formularioData.link_pago}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Ver enlace guardado
+                  </a>
+                  <span className="text-xs text-muted-foreground">
+                    (Se puede editar y volver a guardar)
+                  </span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleGuardarPago}>
+              <Upload className="mr-2 h-4 w-4" />
+              Guardar link de pago
+            </Button>
+          </CardFooter>
+        </Card>
 
-  <Button className="col-span-2" onClick={handleGuardarPago}>
-    <Upload className="mr-2 h-4 w-4" />
-    Guardar link de pago
+        {/* Observaciones abajo */}
+<FaseContent
+  formulario={formularioData}
+  fase={fase.id}
+  nuevaObservacion={nuevaObservacion}
+  setNuevaObservacion={setNuevaObservacion}
+  handleAgregarObservacion={handleAgregarObservacion}
+  acciones={
+<div className="w-full flex justify-start mt-4">
+  <Button onClick={() => handleCambiarFase('constancia_pago')}>
+    Aprobar y Continuar a Constancia
   </Button>
 </div>
 
+  }
+/>
+     
+      </div>
+    ) : (
+      // Para cualquier otra fase, render normal
+      <FaseContent
+        formulario={formularioData}
+        fase={fase.id}
+        nuevaObservacion={nuevaObservacion}
+        setNuevaObservacion={setNuevaObservacion}
+        handleAgregarObservacion={handleAgregarObservacion}
+        acciones={
+          fase.id === 'pendiente' ? (
+            <Button onClick={() => handleCambiarFase('revision')}>Iniciar Revisión</Button>
+          ) : fase.id === 'revision' ? (
+            <div className="flex gap-2">
+              <Button variant="outline">Solicitar Correcciones</Button>
+              <Button onClick={() => handleCambiarFase('proceso_pago')}>Aprobar y Continuar a Pago</Button>
+            </div>
+          ) : null
+        }
+      />
+    )}
+  </TabsContent>
+))}
 
-                  ) : null
-                }
-              />
-            </TabsContent>
-          ))}
         </Tabs>
       </div>
     </AppLayout>

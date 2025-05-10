@@ -30,6 +30,7 @@ interface Formulario {
   pdf_path: string;
   created_at: string;
   sucursal: string;
+  tipo_proceso: string;
 }
 
 interface Props {
@@ -114,7 +115,7 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                         {new Date(formulario.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{formulario.tipo_solicitud}</Badge>
+                        <Badge variant="secondary">{formulario.tipo_proceso}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{formulario.tipo_solicitud}</Badge>

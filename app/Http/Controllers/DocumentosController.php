@@ -11,9 +11,9 @@ class DocumentosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($userId)
+    public function index($Id)
     {
-        $documentos = Documentos::where('user_id', $userId)->get();
+        $documentos = Documentos::where('formulario_medico_id', $Id)->get();
     
         return Inertia::render('FormulariosMedicos/Documentos', [
             'documentos' => $documentos,

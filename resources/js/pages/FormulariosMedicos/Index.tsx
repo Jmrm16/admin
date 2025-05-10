@@ -40,7 +40,7 @@ export default function FormulariosIndex({ formularios }: { formularios: any }) 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre del Paciente</TableHead>
+                  <TableHead>Nombre del Cliente</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>Administrador</TableHead>
                   <TableHead>Acciones</TableHead>

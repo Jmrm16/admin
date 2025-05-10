@@ -751,6 +751,8 @@ $pdf->Cell(0, 10, $valorFormateado, 0, 0, '', false, 1);
                 $pdf->SetXY(50, 210);
                 $pdf->Cell(0, 10, $request->sector_actividad, 0, 1);
 
+
+
                 $pdf->SetXY(50, 220);
                 $pdf->Cell(0, 10, $request->ocupacion, 0, 1);
 
@@ -1011,6 +1013,10 @@ return redirect()->route('dashboard')->with('success', 'Formulario generado y gu
 
                 $pdf->SetXY(38, 82);
                 $pdf->Cell(0, 10, $formulario->sector_actividad, 0, 0, '', false, 1);
+
+                $pdf->SetXY(82, 82);
+                $pdf->Cell(0, 10, $formulario->cual, 0, 0, '', false, 1);
+
                 $pdf->SetXY(135, 82);
                 $pdf->Cell(0, 10, $formulario->ocupacion, 0, 0, '', false, 1);
                 $pdf->SetXY(172, 82);

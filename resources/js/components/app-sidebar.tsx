@@ -4,25 +4,25 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, HouseIcon, LayoutGrid, ListStartIcon, User2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Inicio',
         href: '/dashboard',
-        icon: LayoutGrid,
+        icon: HouseIcon,
     },
     {
         title: 'Usuarios',
         href: '/usuarios',
-        icon: LayoutGrid,
+        icon: User2Icon,
     },
 
     {
         title: 'Formularios Médicos',
         href: '/formularios-medicos',
-        icon: LayoutGrid, // O puedes usar otro icono más relacionado con salud
+        icon: BookOpen, // O puedes usar otro icono más relacionado con salud
     }
     
 ];
