@@ -14,8 +14,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input'; // Add this line to import the Input component
 import axios from 'axios';
 import Documentos from './Documentos';
+import { toast } from 'sonner';
+
 
 interface Observacion {
   id: number;
@@ -47,12 +50,16 @@ interface Formulario {
   }[];
   pdf_path: string;
   admin?: { name: string }; // Added admin property
+  link_pago?: string; // Added link_pago property
 }
 
 export default function FormularioShow({ formulario }: { formulario: Formulario }) {
   const [nuevaObservacion, setNuevaObservacion] = useState('');
   const [activeTab, setActiveTab] = useState<Formulario['fase_actual']>(formulario.estado as Formulario['fase_actual']);
   const [formularioData, setFormularioData] = useState(formulario);
+  
+  const [linkPago, setLinkPago] = useState('');
+
 
   const fases = [
     { id: 'pendiente', label: 'Pendiente', icon: <Clock className="h-4 w-4" /> },
@@ -112,6 +119,36 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
     const faseIndex = fases.findIndex(f => f.id === formularioData.estado);
     return (faseIndex / (fases.length - 1)) * 100;
   };
+const handleGuardarPago = async () => {
+  if (!linkPago.trim()) {
+   toast('Debes proporcionar el link de pago.');
+    return;
+  }
+
+  try {
+    await axios.post(`/formularios-medicos/${formulario.id}/proceso-pago`, {
+      link_pago: linkPago,
+    });
+
+   toast.success('Link guardado correctamente');
+
+
+    setFormularioData((prev) => ({
+      ...prev,
+      link_pago: linkPago,
+    }));
+  } catch (error: any) {
+    if (error.response?.status === 422) {
+      alert('El link debe ser una URL válida.');
+    } else {
+      console.error('Error al guardar el link:', error);
+      toast.error('No se pudo guardar el link.');
+
+    }
+  }
+};
+
+
 
   return (
     <AppLayout>
@@ -184,16 +221,39 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                       <Button onClick={() => handleCambiarFase('proceso_pago')}>Aprobar y Continuar a Pago</Button>
                     </div>
                   ) : fase.id === 'proceso_pago' ? (
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <Button>
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Generar Factura
-                      </Button>
-                      <Button variant="outline">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Subir Comprobante
-                      </Button>
-                    </div>
+<div className="grid gap-4 md:grid-cols-2">
+  <div className="space-y-2 col-span-2">
+    <label className="block text-sm font-medium">Link de pago</label>
+    <Input
+      type="url"
+      placeholder="https://..."
+      value={linkPago}
+      onChange={(e) => setLinkPago(e.target.value)}
+    />
+    {formularioData.link_pago && (
+      <div className="flex items-center justify-between mt-2">
+        <a
+          href={formularioData.link_pago}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Ver enlace guardado
+        </a>
+        <span className="text-xs text-muted-foreground">
+          (Se puede editar y volver a guardar)
+        </span>
+      </div>
+    )}
+  </div>
+
+  <Button className="col-span-2" onClick={handleGuardarPago}>
+    <Upload className="mr-2 h-4 w-4" />
+    Guardar link de pago
+  </Button>
+</div>
+
+
                   ) : null
                 }
               />

@@ -117,6 +117,8 @@ class FormulariosMedicos extends Model
         'direccion_in',
         'fondos',
         'admin_id',
+        'link_pago',
+        'comprobante_pago_path',
         
 
     ];

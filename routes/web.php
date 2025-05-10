@@ -57,6 +57,9 @@ Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController:
 
 
 });
+Route::get('/formularios/{id}/observaciones', [ObservacionesController::class, 'getObservaciones']);
+Route::post('/formularios-medicos/{id}/proceso-pago', [FormularioMedicoController::class, 'guardarPago']);
+
 
 // Rutas del dashboard accesibles para cualquier usuario autenticado
 Route::middleware(['auth', 'verified'])->group(function () {

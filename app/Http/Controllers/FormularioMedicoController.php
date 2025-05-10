@@ -45,6 +45,20 @@ class FormularioMedicoController extends Controller
         ]);
 
     }
+    public function guardarPago(Request $request, $id)
+{
+    $request->validate([
+        'link_pago' => 'required|url',
+    ]);
+
+    $formulario = FormulariosMedicos::findOrFail($id);
+
+    $formulario->link_pago = $request->link_pago;
+    $formulario->save();
+
+    return response()->json(['message' => 'Link de pago guardado correctamente']);
+}
+
 
 
 

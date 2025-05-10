@@ -15,12 +15,13 @@ createInertiaApp({
   setup({ el, App, props }) {
     const root = createRoot(el);
 
-    root.render(
-      <>
-        <App {...props} />
-        <Toaster richColors /> {/* ✅ Notificaciones */}
-      </>
-    );
+root.render(
+  <>
+    <App {...props} />
+    <Toaster richColors position="top-right" />
+  </>
+);
+
   },
   progress: {
     color: '#4B5563',

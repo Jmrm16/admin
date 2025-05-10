@@ -14,7 +14,10 @@ class UsuariosController extends Controller
      */
     public function index()
     {
-        $usuarios = User::select('id', 'name', 'email')->get();
+        $usuarios = User::where('role', 'cliente')
+    ->select('id', 'name', 'email')
+    ->get();
+
     
         return Inertia::render('Usuarios/Index', [
             'usuarios' => $usuarios,
