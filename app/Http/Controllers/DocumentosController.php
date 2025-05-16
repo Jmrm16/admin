@@ -13,7 +13,7 @@ class DocumentosController extends Controller
      */
     public function index($Id)
     {
-        $documentos = Documentos::where('formulario_medico_id', $Id)->get();
+        $documentos = Documentos::where('user_id', $Id)->get();
     
         return Inertia::render('FormulariosMedicos/Documentos', [
             'documentos' => $documentos,

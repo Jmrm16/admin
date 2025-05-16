@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input'; // Add this line to import the Input component
+import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import Documentos from './Documentos';
 import { toast } from 'sonner';
@@ -244,6 +245,32 @@ const handleGuardarPago = async () => {
               Guardar link de pago
             </Button>
           </CardFooter>
+           <CardHeader>
+    <Label htmlFor="recibo_pago">Recibo de pago (PDF)</Label>
+  </CardHeader>
+  <CardContent>
+    <Input
+      type="file"
+      accept="application/pdf"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append('documento', file);
+          formData.append('tipo', 'recibo_pago');
+
+          axios.post(`/formularios-medicos/${formulario.id}/documentos`, formData)
+            .then(() => {
+              toast.success('Recibo de pago subido correctamente');
+              // Podrías recargar los documentos aquí si quieres mostrarlos
+            })
+            .catch(() => {
+              toast.error('Error al subir el recibo de pago');
+            });
+        }
+      }}
+    />
+  </CardContent>
         </Card>
 
         {/* Observaciones abajo */}
@@ -264,7 +291,43 @@ const handleGuardarPago = async () => {
 />
      
       </div>
-    ) : (
+    ):fase.id === 'poliza' ? (
+      // NUEVA LÓGICA PARA POLIZA
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Subir Póliza (PDF)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const formData = new FormData();
+                  formData.append('documento', file);
+                  formData.append('tipo', 'poliza');
+
+                  axios.post(`/formularios-medicos/${formulario.id}/documentos`, formData)
+                    .then(() => toast.success('Póliza subida correctamente'))
+                    .catch(() => toast.error('Error al subir la póliza'));
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <FaseContent
+          formulario={formularioData}
+          fase={fase.id}
+          nuevaObservacion={nuevaObservacion}
+          setNuevaObservacion={setNuevaObservacion}
+          handleAgregarObservacion={handleAgregarObservacion}
+          acciones={null}
+        />
+      </div>
+    )  : (
       // Para cualquier otra fase, render normal
       <FaseContent
         formulario={formularioData}
