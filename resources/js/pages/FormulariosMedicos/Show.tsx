@@ -52,6 +52,8 @@ interface Formulario {
   pdf_path: string;
   admin?: { name: string }; // Added admin property
   link_pago?: string; // Added link_pago property
+    // ✅ Agrega esta línea
+  comprobante_pago_path?: string;
 }
 
 export default function FormularioShow({ formulario }: { formulario: Formulario }) {
@@ -259,7 +261,7 @@ const handleGuardarPago = async () => {
           formData.append('documento', file);
           formData.append('tipo', 'recibo_pago');
 
-          axios.post(`/formularios-medicos/${formulario.id}/documentos`, formData)
+          axios.post(`/formularios-medicos/${formulario.id}/comprobante-pago`, formData)
             .then(() => {
               toast.success('Recibo de pago subido correctamente');
               // Podrías recargar los documentos aquí si quieres mostrarlos
@@ -270,6 +272,20 @@ const handleGuardarPago = async () => {
         }
       }}
     />
+
+        {formularioData.comprobante_pago_path && (
+      <div className="mt-2">
+        <a
+          href={formularioData.comprobante_pago_path}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 text-sm underline"
+        >
+          Ver comprobante de pago
+        </a>
+      </div>
+    )}
+
   </CardContent>
         </Card>
 
@@ -299,22 +315,35 @@ const handleGuardarPago = async () => {
             <CardTitle>Subir Póliza (PDF)</CardTitle>
           </CardHeader>
           <CardContent>
-            <Input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const formData = new FormData();
-                  formData.append('documento', file);
-                  formData.append('tipo', 'poliza');
+                <Input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (formularioData.comprobante_pago_path) {
+                      toast.error("Ya se ha subido un comprobante de pago.");
+                      return;
+                    }
 
-                  axios.post(`/formularios-medicos/${formulario.id}/documentos`, formData)
-                    .then(() => toast.success('Póliza subida correctamente'))
-                    .catch(() => toast.error('Error al subir la póliza'));
-                }
-              }}
-            />
+                    const formData = new FormData();
+                    formData.append('documento', file);
+
+                    axios.post(`/formularios-medicos/${formulario.id}/comprobante-pago`, formData)
+                      .then(() => {
+                        toast.success('Comprobante de pago subido correctamente');
+                        setFormularioData((prev) => ({
+                          ...prev,
+                          comprobante_pago_path: `/storage/formularios/${formulario.id}/comprobantes/${file.name}`,
+                        }));
+                      })
+                      .catch(() => {
+                        toast.error('Error al subir el comprobante de pago');
+                      });
+                  }
+                }}
+              />
+
           </CardContent>
         </Card>
 

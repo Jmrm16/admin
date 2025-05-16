@@ -59,6 +59,8 @@ Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController:
 });
 Route::get('/formularios/{id}/observaciones', [ObservacionesController::class, 'getObservaciones']);
 Route::post('/formularios-medicos/{id}/proceso-pago', [FormularioMedicoController::class, 'guardarPago']);
+Route::post('/formularios-medicos/{id}/comprobante-pago', [FormularioMedicoController::class, 'subirComprobantePago'])
+    ->middleware(['auth', 'verified', 'role:admin']);
 
 
 // Rutas del dashboard accesibles para cualquier usuario autenticado
@@ -72,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
 });
+
+
+
 
 
 // Otros settings y auth

@@ -6,6 +6,7 @@ use App\Models\FormulariosMedicos;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Documentos;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -58,6 +59,26 @@ class FormularioMedicoController extends Controller
 
     return response()->json(['message' => 'Link de pago guardado correctamente']);
 }
+
+public function subirComprobantePago(Request $request, $id)
+{
+    $request->validate([
+        'documento' => 'required|file|mimes:pdf|max:5120',
+    ]);
+
+    $formulario = FormulariosMedicos::findOrFail($id);
+
+    $file = $request->file('documento');
+    $nombreArchivo = 'comprobante_pago_' . time() . '.pdf';
+
+    $ruta = $file->storeAs("formularios/{$id}/comprobantes", $nombreArchivo, 'public');
+
+    $formulario->comprobante_pago_path = Storage::url("formularios/{$id}/comprobantes/{$nombreArchivo}");
+    $formulario->save();
+
+    return response()->json(['message' => 'Comprobante de pago guardado correctamente']);
+}
+
 
 
 
