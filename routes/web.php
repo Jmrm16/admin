@@ -3,6 +3,8 @@
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\DocumentosController;
+use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\DashboardController;
 
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +24,14 @@ Route::get('/', function () {
 
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    
+   Route::get('/whatsapp', fn () => Inertia::render('whatsapp'));
+
+Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
+Route::post('/webhook-ultramsg', [WhatsappController::class, 'webhookUltraMsg']);
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
+
     
     Route::resource('usuarios', UsuariosController::class)->except([]);
   
@@ -68,6 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    
+    
 });
 
 

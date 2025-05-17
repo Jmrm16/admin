@@ -54,6 +54,7 @@ interface Formulario {
   link_pago?: string; // Added link_pago property
     // ✅ Agrega esta línea
   comprobante_pago_path?: string;
+  constancia_pago_path?: string; // <-- Agregado para evitar el error
 }
 
 export default function FormularioShow({ formulario }: { formulario: Formulario }) {
@@ -75,6 +76,8 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
     
 
   ];
+  const faseActualIndex = fases.findIndex((f) => f.id === formularioData.estado);
+
 
   const handleAgregarObservacion = async (fase: string) => {
     if (!nuevaObservacion.trim()) return;
@@ -200,14 +203,20 @@ const handleGuardarPago = async () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as Formulario['fase_actual'])}>
-          <TabsList className="grid w-full grid-cols-7">
-            {fases.map((fase) => (
-              <TabsTrigger key={fase.id} value={fase.id} className="flex gap-2 items-center">
-                {fase.icon}
-                <span className="hidden sm:inline">{fase.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+  <TabsList className="grid w-full grid-cols-7">
+  {fases.map((fase, index) => (
+    <TabsTrigger
+      key={fase.id}
+      value={fase.id}
+      className="flex gap-2 items-center"
+      disabled={index > faseActualIndex}
+    >
+      {fase.icon}
+      <span className="hidden sm:inline">{fase.label}</span>
+    </TabsTrigger>
+  ))}
+</TabsList>
+
 
 {fases.map(fase => (
   <TabsContent key={fase.id} value={fase.id} className="mt-4">
@@ -308,9 +317,52 @@ const handleGuardarPago = async () => {
 
   }
 />
-     
-      </div>
-    ):fase.id === 'poliza' ? (
+     </div>
+    ):fase.id === 'constancia_pago' ? (
+  <div className="space-y-6">
+
+    {/* Mostrar comprobante si existe */}
+    {formularioData.constancia_pago_path ? (
+      <Card>
+        <CardHeader>
+          <CardTitle>Constancia de Pago</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Si es PDF */}
+          {formularioData.constancia_pago_path.endsWith('.pdf') ? (
+            <a
+              href={formularioData.constancia_pago_path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              Ver comprobante de pago (PDF)
+            </a>
+          ) : (
+            // Si es imagen
+            <img
+              src={formularioData.constancia_pago_path}
+              alt="Constancia de pago"
+              className="block mx-auto rounded border shadow max-w-md max-h-[700px] object-contain"
+            />
+          )}
+        </CardContent>
+      </Card>
+    ) : (
+      <p className="text-sm text-muted-foreground">No se ha subido constancia de pago aún.</p>
+    )}
+
+    {/* Observaciones */}
+    <FaseContent
+      formulario={formularioData}
+      fase={fase.id}
+      nuevaObservacion={nuevaObservacion}
+      setNuevaObservacion={setNuevaObservacion}
+      handleAgregarObservacion={handleAgregarObservacion}
+      acciones={null}
+    />
+  </div>
+):fase.id === 'poliza' ? (
       // NUEVA LÓGICA PARA POLIZA
       <div className="space-y-6">
         <Card>

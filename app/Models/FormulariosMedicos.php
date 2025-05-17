@@ -119,9 +119,8 @@ class FormulariosMedicos extends Model
         'admin_id',
         'link_pago',
         'comprobante_pago_path',
-        'tipo_proceso'
-        
-
+        'tipo_proceso',
+        'constancia_pago_path',
     ];
 
     /**
