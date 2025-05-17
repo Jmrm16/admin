@@ -42,7 +42,7 @@ interface Formulario {
   primer_apellido: string;
   segundo_apellido: string;
   nombres: string;
-  fase_actual: 'pendiente' | 'revision' | 'proceso_pago' | 'constancia_pago' | 'poliza' | 'finalizado';
+  fase_actual: 'pendiente' | 'revision' | 'expedicion'| 'proceso_pago' | 'constancia_pago' | 'poliza' | 'finalizado' ;
   observaciones: Observacion[];
   documentos: {
     tipo: string;
@@ -67,10 +67,13 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
   const fases = [
     { id: 'pendiente', label: 'Pendiente', icon: <Clock className="h-4 w-4" /> },
     { id: 'revision', label: 'Revisión', icon: <AlertCircle className="h-4 w-4" /> },
+    { id: 'expedicion', label: 'Expedicion', icon: <CheckCircle className="h-4 w-4" /> },
     { id: 'proceso_pago', label: 'Proceso Pago', icon: <DollarSign className="h-4 w-4" /> },
     { id: 'constancia_pago', label: 'Constancia', icon: <FileCheck className="h-4 w-4" /> },
     { id: 'poliza', label: 'Póliza', icon: <Shield className="h-4 w-4" /> },
     { id: 'finalizado', label: 'Finalizado', icon: <CheckCircle className="h-4 w-4" /> },
+    
+
   ];
 
   const handleAgregarObservacion = async (fase: string) => {
@@ -197,7 +200,7 @@ const handleGuardarPago = async () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as Formulario['fase_actual'])}>
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             {fases.map((fase) => (
               <TabsTrigger key={fase.id} value={fase.id} className="flex gap-2 items-center">
                 {fase.icon}
@@ -369,7 +372,12 @@ const handleGuardarPago = async () => {
             <Button onClick={() => handleCambiarFase('revision')}>Iniciar Revisión</Button>
           ) : fase.id === 'revision' ? (
             <div className="flex gap-2">
-              <Button variant="outline">Solicitar Correcciones</Button>
+           
+              <Button onClick={() => handleCambiarFase('expedicion')}>Aprobar y Continuar a Expedicion</Button>
+            </div>
+          ) :  fase.id === 'expedicion' ? (
+            <div className="flex gap-2">
+           
               <Button onClick={() => handleCambiarFase('proceso_pago')}>Aprobar y Continuar a Pago</Button>
             </div>
           ) : null
