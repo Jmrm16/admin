@@ -1,7 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
+import { ArrowLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,7 +67,20 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
   return (
     <AppLayout>
       <Head title={`Perfil de ${usuario.name}`} />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4, ease: "easeOut" }}
+  className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4"
+>
+        <div className="mb-2">
+  <Button variant="ghost" size="sm" asChild>
+    <Link href="/usuarios">
+      <ArrowLeft className="mr-2 h-4 w-4" />
+      Volver a listado de usuarios
+    </Link>
+  </Button>
+</div>
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">Información del Usuario</CardTitle>
@@ -162,7 +177,7 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </AppLayout>
   );
 }

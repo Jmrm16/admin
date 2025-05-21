@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import Documentos from './Documentos';
 import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
 
 
 interface Observacion {
@@ -165,6 +166,19 @@ const handleGuardarPago = async () => {
       <div className="flex flex-col gap-4 p-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
+            
+
+{/* Justo antes del título */}
+<div className="flex items-center gap-2 mb-4">
+  <Button variant="ghost" size="sm" asChild>
+    <Link href={`/usuarios/${formulario.user_id}`}>
+      <ArrowLeft className="mr-1 h-4 w-4" />
+      Volver al perfil
+    </Link>
+  </Button>
+</div>
+
+
             <h1 className="text-2xl font-bold">Formulario #{formulario.id}</h1>
             <p className="text-muted-foreground">
               {formulario.primer_apellido} {formulario.segundo_apellido} {formulario.nombres}
@@ -318,50 +332,90 @@ const handleGuardarPago = async () => {
   }
 />
      </div>
-    ):fase.id === 'constancia_pago' ? (
+    ) : fase.id === 'constancia_pago' ? (
   <div className="space-y-6">
-
-    {/* Mostrar comprobante si existe */}
-    {formularioData.constancia_pago_path ? (
-      <Card>
-        <CardHeader>
-          <CardTitle>Constancia de Pago</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Si es PDF */}
-          {formularioData.constancia_pago_path.endsWith('.pdf') ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>Constancia de Pago</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {formularioData.constancia_pago_path ? (
+          formularioData.constancia_pago_path.endsWith('.pdf') ? (
             <a
               href={formularioData.constancia_pago_path}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 underline"
             >
-              Ver comprobante de pago (PDF)
+              Ver constancia de pago (PDF)
             </a>
           ) : (
-            // Si es imagen
             <img
               src={formularioData.constancia_pago_path}
               alt="Constancia de pago"
               className="block mx-auto rounded border shadow max-w-md max-h-[700px] object-contain"
             />
-          )}
-        </CardContent>
-      </Card>
-    ) : (
-      <p className="text-sm text-muted-foreground">No se ha subido constancia de pago aún.</p>
-    )}
+          )
+        ) : (
+          <p className="text-sm text-muted-foreground">No se ha subido constancia aún.</p>
+        )}
 
-    {/* Observaciones */}
+        {/* Subida */}
+        <div>
+          <Label htmlFor="constancia_pago">Subir constancia de pago</Label>
+ <Input
+  type="file"
+  accept="application/pdf,image/*"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('documento', file);
+
+      axios
+        .post(`/formulario/${formulario.id}/constancia-pago`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        .then((res) => {
+          toast.success('Constancia de pago subida correctamente');
+          setFormularioData((prev) => ({
+            ...prev,
+            constancia_pago_path: res.data.url,
+          }));
+        })
+        .catch((error) => {
+          if (error.response?.status === 422) {
+            toast.error('Archivo no válido (solo PDF, JPG, PNG, máx 5MB).');
+          } else {
+            toast.error('Error al subir la constancia de pago.');
+          }
+        });
+    }
+  }}
+/>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Observaciones y acción */}
     <FaseContent
       formulario={formularioData}
       fase={fase.id}
       nuevaObservacion={nuevaObservacion}
       setNuevaObservacion={setNuevaObservacion}
       handleAgregarObservacion={handleAgregarObservacion}
-      acciones={null}
+      acciones={
+        <div className="w-full flex justify-start mt-4">
+          <Button onClick={() => handleCambiarFase('poliza')}>
+            Aprobar y Continuar a Póliza
+          </Button>
+        </div>
+      }
     />
   </div>
+
 ):fase.id === 'poliza' ? (
       // NUEVA LÓGICA PARA POLIZA
       <div className="space-y-6">
@@ -384,17 +438,18 @@ const handleGuardarPago = async () => {
                     const formData = new FormData();
                     formData.append('documento', file);
 
-                    axios.post(`/formularios-medicos/${formulario.id}/comprobante-pago`, formData)
-                      .then(() => {
-                        toast.success('Comprobante de pago subido correctamente');
-                        setFormularioData((prev) => ({
-                          ...prev,
-                          comprobante_pago_path: `/storage/formularios/${formulario.id}/comprobantes/${file.name}`,
-                        }));
-                      })
-                      .catch(() => {
-                        toast.error('Error al subir el comprobante de pago');
-                      });
+ axios
+  .post(`/formularios-medicos/${formulario.id}/constancia-pago`, formData)
+  .then((res) => {
+    toast.success('Constancia de pago subida correctamente');
+    setFormularioData((prev) => ({
+      ...prev,
+      constancia_pago_path: res.data.url,
+    }));
+  })
+  .catch(() => {
+    toast.error('Error al subir la constancia de pago');
+  });
                   }
                 }}
               />

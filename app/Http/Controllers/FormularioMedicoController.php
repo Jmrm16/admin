@@ -78,7 +78,28 @@ public function subirComprobantePago(Request $request, $id)
 
     return response()->json(['message' => 'Comprobante de pago guardado correctamente']);
 }
+public function subirConstanciaPago(Request $request, $id)
+{
+    $request->validate([
+        'documento' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+    ]);
 
+    $formulario = FormulariosMedicos::findOrFail($id); // <-- sin Auth::id()
+
+    $file = $request->file('documento');
+    $extension = $file->getClientOriginalExtension();
+    $nombreArchivo = 'constancia_pago_' . time() . '.' . $extension;
+
+    $ruta = $file->storeAs("constancias/{$id}", $nombreArchivo, 'public');
+
+    $formulario->constancia_pago_path = Storage::url($ruta);
+    $formulario->save();
+
+    return response()->json([
+        'message' => 'Constancia subida correctamente.',
+        'url' => Storage::url($ruta),
+    ]);
+}
 
 
 

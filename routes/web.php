@@ -43,6 +43,10 @@ Route::get('/api/notificaciones/no-leidas', function () {
         ->get();
 });
 
+Route::post('/formulario/{id}/constancia-pago', [FormularioMedicoController::class, 'subirConstanciaPago'])
+    ->name('formulario.constancia_pago');
+
+
 Route::post('/api/notificaciones/marcar-leidas', function () {
     Notificacion::where('leida', false)->update(['leida' => true]);
     return response()->json(['ok' => true]);
