@@ -12,8 +12,14 @@ use Inertia\Inertia;
 use App\Http\Controllers\FormularioMedicoController;
 use App\Http\Controllers\ObservacionesController;
 use App\Models\FormulariosMedicos;
+use App\Models\Notificacion;
 
 // REGISTRAR EL MIDDLEWARE AQUÍ
+Route::post('/api/notificaciones/{id}/leer', function ($id) {
+    Notificacion::where('id', $id)->update(['leida' => true]);
+    return response()->json(['ok' => true]);
+});
+
 Route::aliasMiddleware('role', RoleMiddleware::class);
 
 
@@ -25,7 +31,25 @@ Route::get('/', function () {
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
-   Route::get('/whatsapp', fn () => Inertia::render('whatsapp'));
+Route::get('/whatsapp', fn () => Inertia::render('whatsapp'));
+// routes/web.php
+
+
+
+Route::get('/api/notificaciones/no-leidas', function () {
+    return Notificacion::where('leida', false)
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+});
+
+Route::post('/api/notificaciones/marcar-leidas', function () {
+    Notificacion::where('leida', false)->update(['leida' => true]);
+    return response()->json(['ok' => true]);
+});
+
+
+
 
 Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
 Route::post('/webhook-ultramsg', [WhatsappController::class, 'webhookUltraMsg']);

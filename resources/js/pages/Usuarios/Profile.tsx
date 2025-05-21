@@ -31,6 +31,7 @@ interface Formulario {
   created_at: string;
   sucursal: string;
   tipo_proceso: string;
+  admin_id?: number | null;
 }
 
 interface Props {
@@ -49,7 +50,6 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
     axios
       .post(`/formularios-medicos/${formularioId}/estado`, { estado: nuevoEstado })
       .then(() => {
-        // Actualizar estado localmente
         const actualizados = formularios.map((f) =>
           f.id === formularioId ? { ...f, estado: nuevoEstado } : f
         );
@@ -66,7 +66,6 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
     <AppLayout>
       <Head title={`Perfil de ${usuario.name}`} />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-      
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">Información del Usuario</CardTitle>
@@ -102,14 +101,17 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                     <TableHead>ID</TableHead>
                     <TableHead>Fecha de Creación</TableHead>
                     <TableHead>Proceso</TableHead>
-                    <TableHead>Tipo de Solicitud</TableHead>                    
+                    <TableHead>Tipo de Solicitud</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {formularios.map((formulario) => (
-                    <TableRow key={formulario.id}>
+                    <TableRow
+  key={formulario.id}
+  className={!formulario.admin_id ? "bg-white/5 border-l-4 border-yellow-400" : ""}>
+                    
                       <TableCell className="font-medium">{formulario.id}</TableCell>
                       <TableCell>
                         {new Date(formulario.created_at).toLocaleDateString()}
@@ -122,6 +124,11 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{formulario.estado}</Badge>
+                        {formulario.admin_id === null && (
+                          <Badge className="ml-2 bg-yellow-400 text-black">
+                            Sin asignar
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-right space-x-2">
                         <Select
@@ -138,9 +145,8 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                             <SelectItem value="revisión">En Revisión</SelectItem>
                             <SelectItem value="proceso_pago">Aprobado</SelectItem>
                             <SelectItem value="constancia_pago">Rechazado</SelectItem>
-                            <SelectItem value="poliza">poliza</SelectItem>
+                            <SelectItem value="poliza">Poliza</SelectItem>
                             <SelectItem value="finalizado">Finalizado</SelectItem>
-                            
                           </SelectContent>
                         </Select>
                         <Link href={`/formularios-medicos/${formulario.id}`} className="ml-2">

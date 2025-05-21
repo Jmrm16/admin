@@ -33,7 +33,7 @@ class UsuariosController extends Controller
             $query->select([
                 'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud', 
                 'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
-                'created_at','tipo_proceso'
+                'created_at','tipo_proceso','admin_id'
             ])->latest();
         }])->findOrFail($id);
     
