@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\FormularioMedicoController;
 use App\Http\Controllers\ObservacionesController;
 use App\Models\FormulariosMedicos;
+use App\Http\Controllers\WhatsappChatController;
 use App\Models\Notificacion;
 
 // REGISTRAR EL MIDDLEWARE AQUÍ
@@ -88,6 +89,12 @@ Route::post('/formularios-medicos/{id}/iniciar-tramite', [FormularioMedicoContro
 
 Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController::class, 'store'])
     ->name('observaciones.store');
+
+
+    Route::get('/whatsapp', [WhatsappChatController::class, 'index'])->name('whatsapp.index');
+    Route::get('/whatsapp/clientes/{id}/mensajes', [WhatsappChatController::class, 'mensajes'])->name('whatsapp.mensajes');
+    Route::post('/whatsapp/enviar', [WhatsappChatController::class, 'enviar'])->name('whatsapp.enviar');
+    Route::post('/webhook-ultramsg', [WhatsappChatController::class, 'webhook']);
 
 
 });
