@@ -29,6 +29,9 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+
+    Route::post('/webhook-ultramsg', [WhatsappChatController::class, 'webhook']);
+
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
@@ -57,7 +60,7 @@ Route::post('/api/notificaciones/marcar-leidas', function () {
 
 
 Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
-Route::post('/webhook-ultramsg', [WhatsappController::class, 'webhookUltraMsg']);
+//Route::post('/webhook-ultramsg', [WhatsappController::class, 'webhookUltraMsg']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
 
@@ -98,7 +101,6 @@ Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController:
     Route::get('/whatsapp', [WhatsappChatController::class, 'index'])->name('whatsapp.index');
     Route::get('/whatsapp/clientes/{id}/mensajes', [WhatsappChatController::class, 'mensajes'])->name('whatsapp.mensajes');
     Route::post('/whatsapp/enviar', [WhatsappChatController::class, 'enviar'])->name('whatsapp.enviar');
-    Route::post('/webhook-ultramsg', [WhatsappChatController::class, 'webhook']);
 
 
 });

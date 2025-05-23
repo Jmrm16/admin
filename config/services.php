@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'ultramsg' => [
+    'instance' => env('ULTRAMSG_INSTANCE_ID'),
+    'token' => env('ULTRAMSG_TOKEN'),
+],
+
 
 ];
