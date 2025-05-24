@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\FormulariosMedicos;
+use App\Models\Notificacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class UsuariosController extends Controller
 {
@@ -47,13 +49,35 @@ class UsuariosController extends Controller
         $request->validate([
             'estado' => 'required|in:pendiente,revision,expedicion,proceso_pago,constancia_pago,poliza,finalizado',
         ]);
-    
+
         $formulario = FormulariosMedicos::findOrFail($id);
-        $formulario->estado = $request->estado;
-        $formulario->save();
-    
+        $estadoAnterior = $formulario->estado;
+
+        // Solo si el estado es diferente al actual
+        if ($estadoAnterior !== $request->estado) {
+            $formulario->estado = $request->estado;
+            $formulario->save();
+
+            // Guardar la notificación
+            Notificacion::create([
+                'tipo' => 'cambio_estado',
+                'mensaje' => "El formulario #{$formulario->id} cambió de estado de '{$estadoAnterior}' a '{$formulario->estado}'.",
+                'leida' => false,
+                'data' => [
+                    'formulario_id' => $formulario->id,
+                    'admin_id' => $formulario->admin_id,
+                    'usuario_id' => $formulario->user_id,
+                    'estado_anterior' => $estadoAnterior,
+                    'estado_nuevo' => $formulario->estado,
+                    'modificado_por' => Auth::user()->name,
+                ],
+            ]);
+        }
+
         return response()->json(['message' => 'Estado actualizado exitosamente']);
     }
+
+
     
 
     /**

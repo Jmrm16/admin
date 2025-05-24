@@ -146,24 +146,7 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
                         )}
                       </TableCell>
                       <TableCell className="text-right space-x-2">
-                        <Select
-                          value={formulario.estado}
-                          onValueChange={(estado) =>
-                            handleChangeEstado(formulario.id, estado)
-                          }
-                        >
-                          <SelectTrigger className="w-[130px]">
-                            <SelectValue placeholder="Cambiar Estado" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pendiente">Pendiente</SelectItem>
-                            <SelectItem value="revisión">En Revisión</SelectItem>
-                            <SelectItem value="proceso_pago">Aprobado</SelectItem>
-                            <SelectItem value="constancia_pago">Rechazado</SelectItem>
-                            <SelectItem value="poliza">Poliza</SelectItem>
-                            <SelectItem value="finalizado">Finalizado</SelectItem>
-                          </SelectContent>
-                        </Select>
+
                         <Link href={`/formularios-medicos/${formulario.id}`} className="ml-2">
                           <Button size="sm" variant="outline">
                             Detalles

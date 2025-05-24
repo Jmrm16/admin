@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -36,13 +37,20 @@ interface UsuariosIndexProps {
   }[];
 }
 
-
 const MotionCard = motion(Card);
 const MotionCardHeader = motion(CardHeader);
 const MotionCardContent = motion(CardContent);
 const MotionTableRow = motion(TableRow);
 
 export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
+  const [busqueda, setBusqueda] = useState('');
+
+  const usuariosFiltrados = usuarios.filter(
+    (usuario) =>
+      usuario.name.toLowerCase().includes(busqueda.toLowerCase()) ||
+      usuario.email.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Usuarios" />
@@ -76,14 +84,11 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                 <Input
                   placeholder="Buscar usuarios..."
                   className="pl-10 w-full"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
                 />
               </div>
-              <Button asChild className="w-full sm:w-auto">
-                <Link href="/usuarios/create">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Agregar Usuario
-                </Link>
-              </Button>
+             
             </div>
           </MotionCardHeader>
           <MotionCardContent
@@ -102,38 +107,45 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {usuarios.map((usuario) => (
-                    <MotionTableRow
-                      key={usuario.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * usuario.id }}
-                    >
-                      <TableCell className="font-medium">
-                        {usuario.id}
+                  {usuariosFiltrados.length > 0 ? (
+                    usuariosFiltrados.map((usuario) => (
+                      <MotionTableRow
+                        key={usuario.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 * usuario.id }}
+                      >
+                        <TableCell className="font-medium">
+                          {usuario.id}
+                        </TableCell>
+                        <TableCell>{usuario.name}</TableCell>
+                        <TableCell>{usuario.email}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Abrir menú</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/usuarios/${usuario.id}`}>
+                                  Ver Perfil
+                                </Link>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </MotionTableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground">
+                        No se encontraron usuarios.
                       </TableCell>
-                      <TableCell>{usuario.name}</TableCell>
-                      <TableCell>{usuario.email}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Abrir menú</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/usuarios/${usuario.id}`}>
-                                Ver Perfil
-                              </Link>
-                            </DropdownMenuItem>
-                           
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </MotionTableRow>
-                  ))}
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
