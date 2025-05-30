@@ -121,6 +121,7 @@ class FormulariosMedicos extends Model
         'comprobante_pago_path',
         'tipo_proceso',
         'constancia_pago_path',
+        'poliza_path',
     ];
 
     /**

@@ -424,35 +424,42 @@ const handleGuardarPago = async () => {
             <CardTitle>Subir Póliza (PDF)</CardTitle>
           </CardHeader>
           <CardContent>
-                <Input
-                type="file"
-                accept="application/pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    if (formularioData.comprobante_pago_path) {
-                      toast.error("Ya se ha subido un comprobante de pago.");
-                      return;
-                    }
+            <Input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const formData = new FormData();
+                  formData.append('documento', file);
 
-                    const formData = new FormData();
-                    formData.append('documento', file);
+                  axios
+                    .post(`/formularios-medicos/${formulario.id}/poliza`, formData, {
+                      headers: {
+                        'Content-Type': 'multipart/form-data',
+                      },
+                    })
+                    .then((res) => {
+                      toast.success('Póliza subida correctamente');
+                      setFormularioData((prev) => ({
+                          ...prev,
+                          poliza_path: res.data.url,
+                          estado: 'finalizado',
+                          fase_actual: 'finalizado',
+                      }));
 
- axios
-  .post(`/formularios-medicos/${formulario.id}/constancia-pago`, formData)
-  .then((res) => {
-    toast.success('Constancia de pago subida correctamente');
-    setFormularioData((prev) => ({
-      ...prev,
-      constancia_pago_path: res.data.url,
-    }));
-  })
-  .catch(() => {
-    toast.error('Error al subir la constancia de pago');
-  });
-                  }
-                }}
-              />
+                    })
+                    .catch((error) => {
+                      if (error.response?.status === 422) {
+                        toast.error('Archivo no válido (solo PDF, máx 5MB).');
+                      } else {
+                        toast.error('Error al subir la póliza.');
+                      }
+                    });
+                }
+              }}
+            />
+
 
           </CardContent>
         </Card>

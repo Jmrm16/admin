@@ -143,4 +143,44 @@ class FormularioMedicoController extends Controller
             'url' => Storage::url($ruta),
         ]);
     }
+
+public function subirPoliza(Request $request, $id)
+{
+    try {
+        $request->validate([
+            'documento' => 'required|file|mimes:pdf|max:5120',
+        ]);
+
+        $formulario = FormulariosMedicos::findOrFail($id);
+
+        $file = $request->file('documento');
+        $nombreArchivo = 'poliza_' . time() . '.pdf';
+
+        $ruta = $file->storeAs("formularios/{$id}/polizas", $nombreArchivo, 'public');
+
+        $formulario->poliza_path = Storage::url($ruta);
+        $formulario->estado = 'finalizado';
+        $formulario->save();
+
+        Notificacion::create([
+            'tipo' => 'poliza_subida',
+            'mensaje' => "Se subió una póliza y el formulario #{$formulario->id} fue marcado como finalizado.",
+            'leida' => false,
+            'data' => json_encode([
+                'formulario_id' => $formulario->id,
+                'admin_id' => $formulario->admin_id,
+                'usuario_id' => $formulario->user_id,
+            ]),
+        ]);
+
+        return response()->json([
+            'message' => 'Póliza subida correctamente y formulario finalizado.',
+            'url' => Storage::url($ruta),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
 }

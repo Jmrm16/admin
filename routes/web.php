@@ -32,6 +32,11 @@ Route::get('/', function () {
 
     Route::post('/webhook-ultramsg', [WhatsappChatController::class, 'webhook']);
 
+    Route::post('/formularios-medicos/{id}/poliza', [FormularioMedicoController::class, 'subirPoliza'])
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->name('formulario.subir_poliza');
+
+
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
