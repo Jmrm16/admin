@@ -29,7 +29,14 @@ const mainNavItems: NavItem[] = [
         title: 'Whatsapp',
         href: '/whatsapp',
         icon: MessageCircle, // O puedes usar otro icono más relacionado con salud
-    }
+    },
+
+{
+  title: 'Administradores',
+  href: '/usuarios/admins',
+  icon: User2Icon, // puedes usar otro como `ShieldIcon` si deseas distinguirlo
+}
+
     
     
     

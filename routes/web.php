@@ -39,6 +39,15 @@ Route::get('/', function () {
 
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+
+    Route::get('/usuarios/create', [UsuariosController::class, 'create'])->name('usuarios.create');
+    Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios/admins', [UsuariosController::class, 'admins'])->name('usuarios.admins');
+    Route::get('/usuarios/admins/{id}', [UsuariosController::class, 'showAdmin'])->name('usuarios.admins.show');
+
+
+
+
     
 Route::get('/whatsapp', fn () => Inertia::render('whatsapp'));
 // routes/web.php
@@ -67,7 +76,10 @@ Route::post('/api/notificaciones/marcar-leidas', function () {
 Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
 //Route::post('/webhook-ultramsg', [WhatsappController::class, 'webhookUltraMsg']);
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified']);
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
 
     
     Route::resource('usuarios', UsuariosController::class)->except([]);
@@ -116,13 +128,7 @@ Route::post('/formularios-medicos/{id}/comprobante-pago', [FormularioMedicoContr
 
 
 // Rutas del dashboard accesibles para cualquier usuario autenticado
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-    
-    
-});
+
 
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
