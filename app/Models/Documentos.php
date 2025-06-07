@@ -58,10 +58,12 @@ class Documentos extends Model
     public function getTipoLegibleAttribute()
     {
         $tipos = [
-            'documento_identidad' => 'Documento de Identidad',
-            'certificado_existencia' => 'Certificado de Existencia',
-            'estados_financieros' => 'Estados Financieros',
-            'formulario_firmado' => 'Formulario Firmado'
+          'formulario_sarlaft' => 'Formulario SARLAFT',
+            'cedula' => 'Cédula',
+            'rut' => 'RUT',
+            'diploma' => 'Diploma',
+            'tarjeta_profesional' => 'Tarjeta Profesional'
+
         ];
 
         return $tipos[$this->tipo] ?? $this->tipo;

@@ -40,7 +40,7 @@ Route::get('/', function () {
 // Rutas de Usuarios protegidas solo para ADMIN
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
-    Route::get('/usuarios/create', [UsuariosController::class, 'create'])->name('usuarios.create');
+  
     Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
     Route::get('/usuarios/admins', [UsuariosController::class, 'admins'])->name('usuarios.admins');
     Route::get('/usuarios/admins/{id}', [UsuariosController::class, 'showAdmin'])->name('usuarios.admins.show');

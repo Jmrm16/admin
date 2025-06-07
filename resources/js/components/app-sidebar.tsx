@@ -14,13 +14,13 @@ const mainNavItems: NavItem[] = [
         icon: HouseIcon,
     },
     {
-        title: 'Usuarios',
+        title: 'Clientes',
         href: '/usuarios',
         icon: User2Icon,
     },
 
     {
-        title: 'Formularios Médicos',
+        title: 'Mis formularios',
         href: '/formularios-medicos',
         icon: BookOpen, // O puedes usar otro icono más relacionado con salud
     },

@@ -17,7 +17,7 @@ interface Formulario {
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Formularios Médicos',
+    title: 'Mis Formularios',
     href: '/formularios-medicos',
   },
 ];
@@ -29,13 +29,13 @@ export default function FormulariosIndex({ formularios }: { formularios: any }) 
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Formularios Médicos" />
+      <Head title="Mis Formularios" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
        
 
         <div className=" relative flex-1 overflow-hidden rounded-xl border p-4">
           <div className="relative z-10">
-            <h1 className="text-2xl font-bold mb-4">Listado de Formularios Médicos</h1>
+            <h1 className="text-2xl font-bold mb-4">Listado de Formularios Asignados</h1>
 
             <Table>
               <TableHeader>

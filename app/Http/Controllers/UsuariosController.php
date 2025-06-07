@@ -6,98 +6,106 @@ use App\Models\User;
 use App\Models\FormulariosMedicos;
 use App\Models\Notificacion;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class UsuariosController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ========================
+    // INDEX - CLIENTES
+    // ========================
     public function index()
     {
         $usuarios = User::where('role', 'cliente')
-    ->select('id', 'name', 'email')
-    ->get();
+            ->select('id', 'name', 'email')
+            ->get();
 
-    
         return Inertia::render('Usuarios/Index', [
             'usuarios' => $usuarios,
         ]);
     }
 
+    // ========================
+    // INDEX - ADMINISTRADORES
+    // ========================
+    public function admins()
+    {
+        $usuarios = User::where('role', 'admin')
+            ->select('id', 'name', 'email')
+            ->get();
 
+        return Inertia::render('Usuarios/Admins', [
+            'usuarios' => $usuarios,
+        ]);
+    }
 
-         public function admins()
-        {
-            $usuarios = User::where('role', 'admin')->get();
-            return Inertia::render('Usuarios/Admins', [
-                'usuarios' => $usuarios,
-            ]);
+    // ========================
+    // SHOW - PERFIL DE USUARIO
+    // ========================
+    public function show($id)
+    {
+        $usuario = User::findOrFail($id);
+
+        if ($usuario->role === 'admin') {
+            // Admin: obtener formularios asignados
+            $formularios = FormulariosMedicos::where('admin_id', $usuario->id)
+                ->with('user:id,name,email')
+                ->select([
+                    'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
+                    'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
+                    'created_at', 'tipo_proceso', 'admin_id'
+                ])
+                ->latest()
+                ->get();
+        } else {
+            // Cliente: usar relación definida
+            $usuario->load(['formulariosMedicos' => function ($query) {
+                $query->select([
+                    'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
+                    'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
+                    'created_at', 'tipo_proceso', 'admin_id'
+                ])->latest();
+            }]);
+
+            $formularios = $usuario->formulariosMedicos;
         }
 
+        return Inertia::render('Usuarios/Profile', [
+            'usuario' => $usuario,
+            'formularios' => $formularios,
+            'esAdmin' => $usuario->role === 'admin',
+        ]);
+    }
 
-    /**
-     * Display the specified resource.
-     */
-public function show($id)
-{
-    $usuario = User::findOrFail($id);
+    // ========================
+    // PERFIL DE ADMINISTRADOR
+    // ========================
+    public function showAdmin($id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
 
-    if ($usuario->role === 'admin') {
-        // Si es admin, obtener formularios donde admin_id = id
-        $formularios = FormulariosMedicos::where('admin_id', $usuario->id)
+        $formulariosAsignados = FormulariosMedicos::where('admin_id', $admin->id)
             ->select([
                 'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
                 'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
                 'created_at', 'tipo_proceso', 'admin_id'
             ])
-            ->with('user:id,name,email') // para mostrar info del cliente
             ->latest()
             ->get();
-    } else {
-        // Si es cliente, usar la relación ya definida
-        $usuario->load(['formulariosMedicos' => function($query) {
-            $query->select([
-                'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
-                'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
-                'created_at', 'tipo_proceso', 'admin_id'
-            ])->latest();
-        }]);
-        $formularios = $usuario->formulariosMedicos;
+
+        $emitidas = $formulariosAsignados->where('estado', 'finalizado')->count();
+
+        return Inertia::render('Usuarios/AdminProfile', [
+            'admin' => $admin,
+            'formularios' => $formulariosAsignados,
+            'emitidas' => $emitidas,
+            'asignadas' => $formulariosAsignados->count(),
+        ]);
     }
 
-    return Inertia::render('Usuarios/Profile', [
-        'usuario' => $usuario,
-        'formularios' => $formularios,
-        'esAdmin' => $usuario->role === 'admin',
-    ]);
-}
-
-public function showAdmin($id)
-{
-    $admin = User::where('role', 'admin')->findOrFail($id);
-
-    $formulariosAsignados = FormulariosMedicos::where('admin_id', $admin->id)
-        ->select([
-            'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
-            'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
-            'created_at', 'tipo_proceso', 'admin_id'
-        ])
-        ->latest()
-        ->get();
-
-    $emitidas = $formulariosAsignados->where('estado', 'finalizado')->count();
-
-    return Inertia::render('Usuarios/AdminProfile', [
-        'admin' => $admin,
-        'formularios' => $formulariosAsignados,
-        'emitidas' => $emitidas,
-        'asignadas' => $formulariosAsignados->count(),
-    ]);
-}
-
-
+    // ========================
+    // CAMBIAR ESTADO DE FORMULARIO
+    // ========================
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
@@ -107,12 +115,10 @@ public function showAdmin($id)
         $formulario = FormulariosMedicos::findOrFail($id);
         $estadoAnterior = $formulario->estado;
 
-        // Solo si el estado es diferente al actual
         if ($estadoAnterior !== $request->estado) {
             $formulario->estado = $request->estado;
             $formulario->save();
 
-            // Guardar la notificación
             Notificacion::create([
                 'tipo' => 'cambio_estado',
                 'mensaje' => "El formulario #{$formulario->id} cambió de estado de '{$estadoAnterior}' a '{$formulario->estado}'.",
@@ -131,86 +137,70 @@ public function showAdmin($id)
         return response()->json(['message' => 'Estado actualizado exitosamente']);
     }
 
-
-    
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // ========================
+    // CREAR USUARIO
+    // ========================
+ 
+    public function store(Request $request)
     {
-        return Inertia::render('Usuarios/Create');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|in:admin,cliente',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => $validated['role'],
+        ]);
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:6',
-        'role' => 'required|in:admin,cliente', // Aquí está el campo que debes validar
-    ]);
-
-    $user = \App\Models\User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => bcrypt($validated['password']),
-        'role' => $validated['role'], // Aquí se guarda correctamente
-    ]);
-
-    return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
-}
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // ========================
+    // EDITAR USUARIO
+    // ========================
     public function edit($id)
     {
         $usuario = User::findOrFail($id);
-        
+
         return Inertia::render('Usuarios/Edit', [
             'usuario' => $usuario,
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $usuario = User::findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$usuario->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $usuario->id,
             'password' => 'nullable|string|min:8',
         ]);
 
         if (empty($validated['password'])) {
             unset($validated['password']);
+        } else {
+            $validated['password'] = bcrypt($validated['password']);
         }
 
         $usuario->update($validated);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // ========================
+    // ELIMINAR USUARIO
+    // ========================
     public function destroy($id)
     {
         $usuario = User::findOrFail($id);
         $usuario->delete();
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente');
+        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente.');
     }
-
-
-
-
 }

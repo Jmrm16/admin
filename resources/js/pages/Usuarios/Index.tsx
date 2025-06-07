@@ -24,7 +24,7 @@ import { motion } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Usuarios',
+    title: 'Clientes',
     href: '/usuarios',
   },
 ];
@@ -73,9 +73,9 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
             transition={{ delay: 0.2 }}
           >
             <div>
-              <CardTitle className="text-2xl">Lista de Usuarios</CardTitle>
+              <CardTitle className="text-2xl">Lista de Clientes</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Administra los usuarios registrados en el sistema
+                Administra los Clientes registrados en el sistema
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -121,21 +121,12 @@ export default function UsuariosIndex({ usuarios }: UsuariosIndexProps) {
                         <TableCell>{usuario.name}</TableCell>
                         <TableCell>{usuario.email}</TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Abrir menú</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={`/usuarios/${usuario.id}`}>
-                                  Ver Perfil
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Link href={`/usuarios/${usuario.id}`}>
+                            <Button size="sm" variant="outline">
+                              Ver Perfil
+                            </Button>
+                          </Link>
+                   
                         </TableCell>
                       </MotionTableRow>
                     ))

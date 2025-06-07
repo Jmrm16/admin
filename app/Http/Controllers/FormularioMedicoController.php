@@ -27,32 +27,34 @@ class FormularioMedicoController extends Controller
         ]);
     }
 
-    public function show(FormulariosMedicos $formularioMedico)
-    {
-        if (is_null($formularioMedico->admin_id)) {
-            $formularioMedico->admin_id = Auth::id();
-            $formularioMedico->save();
+        public function show(FormulariosMedicos $formularioMedico)
+        {
+            if (is_null($formularioMedico->admin_id)) {
+                $formularioMedico->admin_id = Auth::id();
+                $formularioMedico->estado = 'pendiente'; 
+                $formularioMedico->save();
 
-            Notificacion::create([
-                'tipo' => 'asignacion_admin',
-                'mensaje' => "El formulario #{$formularioMedico->id} ha sido asignado al admin " . Auth::user()->name,
-                'leida' => false,
-                'data' => [
-                    'formulario_id' => $formularioMedico->id,
-                    'admin_id' => Auth::id(),
-                    'usuario_id' => $formularioMedico->user_id,
-                ],
+                Notificacion::create([
+                    'tipo' => 'asignacion_admin',
+                    'mensaje' => "El formulario #{$formularioMedico->id} ha sido asignado al admin " . Auth::user()->name,
+                    'leida' => false,
+                    'data' => [
+                        'formulario_id' => $formularioMedico->id,
+                        'admin_id' => Auth::id(),
+                        'usuario_id' => $formularioMedico->user_id,
+                    ],
+                ]);
+            }
+
+            return Inertia::render('FormulariosMedicos/Show', [
+                'formulario' => $formularioMedico->load([
+                    'user',
+                    'admin',
+                    'observaciones.creadoPor',
+                ]),
             ]);
         }
 
-        return Inertia::render('FormulariosMedicos/Show', [
-            'formulario' => $formularioMedico->load([
-                'user',
-                'admin',
-                'observaciones.creadoPor',
-            ]),
-        ]);
-    }
 
     public function guardarPago(Request $request, $id)
     {
@@ -159,12 +161,12 @@ public function subirPoliza(Request $request, $id)
         $ruta = $file->storeAs("formularios/{$id}/polizas", $nombreArchivo, 'public');
 
         $formulario->poliza_path = Storage::url($ruta);
-        $formulario->estado = 'finalizado';
+        // ❌ Ya no cambiamos el estado aquí
         $formulario->save();
 
         Notificacion::create([
             'tipo' => 'poliza_subida',
-            'mensaje' => "Se subió una póliza y el formulario #{$formulario->id} fue marcado como finalizado.",
+            'mensaje' => "Se subió una póliza para el formulario #{$formulario->id}.",
             'leida' => false,
             'data' => json_encode([
                 'formulario_id' => $formulario->id,
@@ -174,13 +176,14 @@ public function subirPoliza(Request $request, $id)
         ]);
 
         return response()->json([
-            'message' => 'Póliza subida correctamente y formulario finalizado.',
+            'message' => 'Póliza subida correctamente.',
             'url' => Storage::url($ruta),
         ]);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+
 
 
 }

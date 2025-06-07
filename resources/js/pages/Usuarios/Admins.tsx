@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PlusCircle, Search, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Create from './Create'; // Asegúrate que la ruta es correcta
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -34,10 +35,9 @@ interface AdminsProps {
     id: number;
     name: string;
     email: string;
-    role: string; // ✅ Agregamos el campo 'role'
+    role: string;
   }[];
 }
-
 
 const MotionCard = motion(Card);
 const MotionCardHeader = motion(CardHeader);
@@ -46,6 +46,7 @@ const MotionTableRow = motion(TableRow);
 
 export default function UsuariosAdmins({ usuarios }: AdminsProps) {
   const [busqueda, setBusqueda] = useState('');
+  const [modalAbierto, setModalAbierto] = useState(false);
 
   const filtrados = usuarios.filter(
     (u) =>
@@ -91,14 +92,13 @@ export default function UsuariosAdmins({ usuarios }: AdminsProps) {
                 />
               </div>
 
-                <Link href="/usuarios/create">
-                <Button className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto" onClick={() => setModalAbierto(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Crear Usuario
-                </Button>
-            </Link>
+              </Button>
             </div>
           </MotionCardHeader>
+
           <MotionCardContent
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -127,21 +127,18 @@ export default function UsuariosAdmins({ usuarios }: AdminsProps) {
                         <TableCell>{usuario.name}</TableCell>
                         <TableCell>{usuario.email}</TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Abrir menú</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={usuario.role === 'admin' ? `/usuarios/admins/${usuario.id}` : `/usuarios/${usuario.id}`}>
-                                  Ver Perfil
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Link
+                            href={
+                              usuario.role === 'admin'
+                                ? `/usuarios/admins/${usuario.id}`
+                                : `/usuarios/${usuario.id}`
+                            }
+                          >
+                            <Button size="sm" variant="outline">
+                              Ver Perfil
+                            </Button>
+                          </Link>
+
                         </TableCell>
                       </MotionTableRow>
                     ))
@@ -157,7 +154,11 @@ export default function UsuariosAdmins({ usuarios }: AdminsProps) {
             </div>
           </MotionCardContent>
         </MotionCard>
+
+        {/* Modal de creación */}
+        <Create open={modalAbierto} onOpenChange={setModalAbierto} />
       </motion.div>
     </AppLayout>
   );
 }
+ 

@@ -56,6 +56,7 @@ interface Formulario {
     // ✅ Agrega esta línea
   comprobante_pago_path?: string;
   constancia_pago_path?: string; // <-- Agregado para evitar el error
+  poliza_path?: string; // <-- Agregado para evitar el error de poliza_path
 }
 
 export default function FormularioShow({ formulario }: { formulario: Formulario }) {
@@ -189,7 +190,7 @@ const handleGuardarPago = async () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/documentos/${formulario.id}`}>
+              <Link href={`/documentos/${formulario.user_id}`}>
                 <DownloadIcon className="mr-2 h-4 w-4" />
                 Documentos
               </Link>
@@ -419,59 +420,85 @@ const handleGuardarPago = async () => {
 ):fase.id === 'poliza' ? (
       // NUEVA LÓGICA PARA POLIZA
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Subir Póliza (PDF)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const formData = new FormData();
-                  formData.append('documento', file);
+              <Card>
+                <CardHeader>
+                  <CardTitle>Subir Póliza (PDF)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const formData = new FormData();
+                        formData.append('documento', file);
 
-                  axios
-                    .post(`/formularios-medicos/${formulario.id}/poliza`, formData, {
-                      headers: {
-                        'Content-Type': 'multipart/form-data',
-                      },
-                    })
-                    .then((res) => {
-                      toast.success('Póliza subida correctamente');
-                      setFormularioData((prev) => ({
-                          ...prev,
-                          poliza_path: res.data.url,
-                          estado: 'finalizado',
-                          fase_actual: 'finalizado',
-                      }));
-
-                    })
-                    .catch((error) => {
-                      if (error.response?.status === 422) {
-                        toast.error('Archivo no válido (solo PDF, máx 5MB).');
-                      } else {
-                        toast.error('Error al subir la póliza.');
+                        axios
+                          .post(`/formularios-medicos/${formulario.id}/poliza`, formData, {
+                            headers: {
+                              'Content-Type': 'multipart/form-data',
+                            },
+                          })
+                          .then((res) => {
+                            toast.success('Póliza subida correctamente');
+                            setFormularioData((prev) => ({
+                              ...prev,
+                              poliza_path: res.data.url, // aquí guardas la ruta devuelta por el backend
+                              estado: 'finalizado',
+                              fase_actual: 'finalizado',
+                            }));
+                          })
+                          .catch((error) => {
+                            if (error.response?.status === 422) {
+                              toast.error('Archivo no válido (solo PDF, máx 5MB).');
+                            } else {
+                              toast.error('Error al subir la póliza.');
+                            }
+                          });
                       }
-                    });
-                }
-              }}
-            />
+                    }}
+                  />
 
-
-          </CardContent>
-        </Card>
-
-        <FaseContent
-          formulario={formularioData}
-          fase={fase.id}
-          nuevaObservacion={nuevaObservacion}
-          setNuevaObservacion={setNuevaObservacion}
-          handleAgregarObservacion={handleAgregarObservacion}
-          acciones={null}
-        />
+                  {/* Mostrar enlace o vista si ya está subida */}
+                  {formularioData.poliza_path && (
+                    <div className="mt-4">
+                      {formularioData.poliza_path.endsWith('.pdf') ? (
+                        <a
+                          href={formularioData.poliza_path}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          Ver Póliza (PDF)
+                        </a>
+                      ) : (
+                        <img
+                          src={formularioData.poliza_path}
+                          alt="Póliza"
+                          className="block mx-auto rounded border shadow max-w-md max-h-[700px] object-contain"
+                        />
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+    <FaseContent
+      formulario={formularioData}
+      fase={fase.id}
+      nuevaObservacion={nuevaObservacion}
+      setNuevaObservacion={setNuevaObservacion}
+      handleAgregarObservacion={handleAgregarObservacion}
+      acciones={
+        <Button
+          variant="default"
+          onClick={() => handleCambiarFase('finalizado')}
+          disabled={formularioData.estado === 'finalizado'}
+        >
+          Finalizar
+        </Button>
+      }
+    />
       </div>
     )  : (
       // Para cualquier otra fase, render normal
@@ -552,7 +579,7 @@ function FaseContent({
                         <p className="m-0">{obs.respuesta}</p>
                       </div>
                     )}
-</div>
+                   </div>
 
                   </li>
                 ))}
