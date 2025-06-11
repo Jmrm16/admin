@@ -157,7 +157,7 @@ class UsuariosController extends Controller
             'role' => $validated['role'],
         ]);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
+        return redirect()->route('usuarios.admins')->with('success', 'Usuario creado correctamente.');
     }
 
     // ========================
