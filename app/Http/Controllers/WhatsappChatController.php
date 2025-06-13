@@ -73,6 +73,12 @@ public function webhook(Request $request)
     logger('📥 Webhook recibido:', $request->all());
 
     $data = $request->input('data');
+    // 💡 Ignorar mensajes que yo mismo envié (el bot)
+if (isset($data['fromMe']) && $data['fromMe'] === true) {
+    logger("🔁 Ignorado mensaje del bot: {$data['body']}");
+    return response('OK', 200);
+}
+
 
     if (!$data || !isset($data['from']) || !isset($data['body'])) {
         return response()->json([
@@ -81,28 +87,111 @@ public function webhook(Request $request)
         ], 422);
     }
 
-    // 💡 Normalizar número
     $numeroCompleto = $data['from'];
-    $numeroLimpio = preg_replace('/@.*/', '', $numeroCompleto); // elimina @c.us, @g.us, etc.
-    $mensaje = $data['body'];
+    $numeroLimpio = preg_replace('/@.*/', '', $numeroCompleto);
+    $mensaje = trim($data['body']);
 
-    // Buscar o crear cliente por número limpio
+    // Buscar o crear cliente
     $cliente = WhatsappCliente::firstOrCreate(
         ['numero' => $numeroLimpio],
-        ['nombre' => 'Sin nombre']
+        ['nombre' => 'Sin nombre', 'estado' => 'inicio']
     );
 
-    // Guardar mensaje
-    WhatsappMensaje::create([
-        'whatsapp_cliente_id' => $cliente->id,
+    // 🔁 Evitar bucles: ¿ya recibimos este mismo mensaje hace menos de 10 segundos?
+    $esDuplicado = $cliente->mensajes()
+        ->where('contenido', $mensaje)
+        ->where('tipo', 'recibido')
+        ->where('created_at', '>=', now()->subSeconds(10))
+        ->exists();
+
+    if ($esDuplicado) {
+        logger("⚠️ Mensaje duplicado ignorado: $mensaje");
+        return response('OK', 200);
+    }
+
+    // Guardar mensaje recibido
+    $cliente->mensajes()->create([
         'contenido' => $mensaje,
         'tipo' => 'recibido',
     ]);
 
-    logger("✅ Mensaje guardado de $numeroLimpio: $mensaje");
+    // 🚦 Lógica del chatbot
+    $estado = $cliente->estado;
+    $respuesta = '🤖 Lo siento, no entendí.';
 
-    return response()->json(['success' => true]);
+    // Permitir reinicio con "hola"
+    if (strtolower($mensaje) === 'hola') {
+        $cliente->estado = 'inicio';
+        $estado = 'inicio';
+    }
+
+    switch ($estado) {
+        case 'inicio':
+            $respuesta = '👋 ¡Hola! Por favor escribe tu nombre y cédula para continuar.';
+            $cliente->estado = 'esperando_datos';
+            break;
+
+        case 'esperando_datos':
+            $cliente->nombre = $mensaje;
+            $cliente->estado = 'menu';
+            $respuesta = "✅ Gracias, *{$mensaje}*.\nAhora selecciona una opción:\n1️⃣ Póliza Médica\n2️⃣ Póliza RCP";
+            break;
+
+        case 'menu':
+            if ($mensaje === '1') {
+                $cliente->estado = 'poliza_medica';
+                $respuesta = '🩺 Has seleccionado *Póliza Médica*. ¿Deseas 1️⃣ Cotizar o 2️⃣ Consultar estado?';
+            } elseif ($mensaje === '2') {
+                $cliente->estado = 'poliza_rcp';
+                $respuesta = '📄 Has seleccionado *Póliza RCP*. ¿Deseas 1️⃣ Cotizar o 2️⃣ Consultar estado?';
+            } else {
+                $respuesta = '❌ Opción no válida. Escribe 1 o 2.';
+            }
+            break;
+
+        case 'poliza_medica':
+        case 'poliza_rcp':
+            if ($mensaje === '1') {
+                $respuesta = '📄 Perfecto. Pronto te contactaremos para cotizar tu póliza.';
+                $cliente->estado = 'finalizado';
+            } elseif ($mensaje === '2') {
+                $respuesta = '🔎 Por favor escribe tu número de documento para verificar el estado.';
+                $cliente->estado = 'esperando_documento';
+            } else {
+                $respuesta = '❌ Escribe 1 para cotizar o 2 para consultar estado.';
+            }
+            break;
+
+        case 'esperando_documento':
+            $respuesta = "✅ Gracias. Estamos consultando el estado de tu póliza con cédula *{$mensaje}*. Pronto te responderemos.";
+            $cliente->estado = 'finalizado';
+            break;
+
+        case 'finalizado':
+            $respuesta = '✅ Gracias por comunicarte. Si deseas comenzar otra consulta, escribe "Hola".';
+            break;
+    }
+
+    $cliente->save();
+
+    // Registrar respuesta solo si hay algo que decir
+    if ($respuesta) {
+        $cliente->mensajes()->create([
+            'contenido' => $respuesta,
+            'tipo' => 'enviado',
+        ]);
+
+        // Enviar mensaje real por UltraMsg
+        Http::post("https://api.ultramsg.com/" . config('services.ultramsg.instance') . "/messages/chat", [
+            'token' => config('services.ultramsg.token'),
+            'to' => $numeroLimpio,
+            'body' => $respuesta,
+        ]);
+    }
+
+    return response('OK', 200);
 }
+
 
 
 

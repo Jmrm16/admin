@@ -21,8 +21,6 @@ use App\Http\Middleware\RoleMiddleware;
 Route::aliasMiddleware('role', RoleMiddleware::class);
 
 // ✅ TODAS las rutas dentro del prefijo /admin
-Route::prefix('admin')->group(function () {
-
     // Ruta base redirige al login
     Route::get('/', function () {
         return redirect()->route('login');
@@ -91,7 +89,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/whatsapp/enviar', [WhatsappChatController::class, 'enviar'])->name('whatsapp.enviar');
         Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
     });
-});
 
 // Otros settings y auth
 require __DIR__.'/settings.php';

@@ -8,7 +8,7 @@ class WhatsappCliente extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'numero'];
+    protected $fillable = ['nombre', 'numero', 'estado'];
 
     public function mensajes()
     {
