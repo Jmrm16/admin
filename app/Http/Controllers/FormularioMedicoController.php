@@ -29,9 +29,12 @@ class FormularioMedicoController extends Controller
 
         public function show(FormulariosMedicos $formularioMedico)
         {
+            // Recargamos por si viene sin user_id
             if (is_null($formularioMedico->admin_id)) {
+                $formularioMedico = FormulariosMedicos::with('user')->findOrFail($formularioMedico->id);
+
                 $formularioMedico->admin_id = Auth::id();
-                $formularioMedico->estado = 'pendiente'; 
+                $formularioMedico->estado = 'pendiente';
                 $formularioMedico->save();
 
                 Notificacion::create([
@@ -54,6 +57,7 @@ class FormularioMedicoController extends Controller
                 ]),
             ]);
         }
+
 
 
     public function guardarPago(Request $request, $id)

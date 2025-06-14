@@ -1,10 +1,11 @@
 import { Head } from '@inertiajs/react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 import AppLayout from '@/layouts/app-layout';
 import { MetricCard } from '@/components/MetricCard';
 import { FileText, DollarSign, Users, CheckCircle, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ComponentType } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface Props {
   clientes: number;
@@ -50,55 +51,66 @@ export default function Dashboard(props: Props) {
       {/* Gráficos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
         {/* PieChart: Estados */}
-        <motion.div
-          className="bg-zinc-900 p-6 rounded-xl shadow-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-lg font-bold text-white mb-4">Pólizas por Estado</h2>
-          {estados.length > 0 ? (
-            <PieChart width={340} height={300}>
-              <Pie
-                data={estados}
-                dataKey="total"
-                nameKey="estado"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              >
-                {estados.map((_, index) => (
-                  <Cell key={index} fill={colors[index % colors.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend layout="horizontal" align="center" verticalAlign="bottom" />
-            </PieChart>
-          ) : (
-            <p className="text-sm text-gray-400">No hay datos disponibles.</p>
-          )}
-        </motion.div>
+          {/* PieChart */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Pólizas por Estado</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {estados.length > 0 ? (
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={estados}
+                          dataKey="total"
+                          nameKey="estado"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        >
+                          {estados.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No hay datos disponibles.</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* BarChart: Por mes */}
-        <motion.div
-          className="bg-zinc-900 p-6 rounded-xl shadow-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <h2 className="text-lg font-bold text-white mb-4">Pólizas por Mes</h2>
-          {porMes.length > 0 ? (
-            <BarChart width={500} height={300} data={porMes}>
-              <XAxis dataKey="mes" stroke="#ccc" />
-              <YAxis stroke="#ccc" />
-              <Tooltip />
-              <Bar dataKey="total" fill="#a78bfa" radius={[10, 10, 0, 0]} />
-            </BarChart>
-          ) : (
-            <p className="text-sm text-gray-400">No hay datos disponibles.</p>
-          )}
-        </motion.div>
+        {/* BarChart */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Pólizas por Mes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {porMes.length > 0 ? (
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={porMes}>
+                        <XAxis dataKey="mes" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip />
+                        <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No hay datos disponibles.</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
       </div>
 
       {/* Notificaciones */}

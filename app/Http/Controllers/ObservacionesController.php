@@ -28,6 +28,7 @@ class ObservacionesController extends Controller
 
         $formulario->observaciones()->save($observacion);
 
+
         // ✅ Crear notificación
         Notificacion::create([
             'tipo' => 'nueva_observacion',
@@ -37,11 +38,13 @@ class ObservacionesController extends Controller
                 'formulario_id' => $formulario->id,
                 'observacion_id' => $observacion->id,
                 'fase' => $observacion->fase,
+                'contenido' => $observacion->contenido, // ✅ contenido de la observación
                 'usuario_id' => $formulario->user_id,
                 'admin_id' => $formulario->admin_id,
                 'creado_por' => Auth::id(),
             ],
         ]);
+
 
         return response()->json([
             'message' => 'Observación agregada exitosamente',

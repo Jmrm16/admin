@@ -73,7 +73,7 @@ export default function Profile({ usuario, formularios: initialFormularios }: Pr
   transition={{ duration: 0.4, ease: "easeOut" }}
   className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4"
 >
-        <div className="mb-2">
+    <div className="mb-2">
   <Button variant="ghost" size="sm" asChild>
     <Link href="/usuarios">
       <ArrowLeft className="mr-2 h-4 w-4" />

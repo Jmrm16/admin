@@ -11,14 +11,18 @@ class DocumentosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($Id)
-    {
-        $documentos = Documentos::where('user_id', $Id)->get();
-    
-        return Inertia::render('FormulariosMedicos/Documentos', [
-            'documentos' => $documentos,
-        ]);
-    }
+public function index($userId)
+{
+    $documentos = Documentos::where('user_id', $userId)->get();
+
+    // Obtener el primer formulario asociado (o el más reciente, según lo necesites)
+    $formularioId = $documentos->first()?->formulario_medico_id ?? null;
+
+    return Inertia::render('FormulariosMedicos/Documentos', [
+        'documentos' => $documentos,
+        'formularioId' => $formularioId, // 👈 para el botón
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.

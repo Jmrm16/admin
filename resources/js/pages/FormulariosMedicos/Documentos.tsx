@@ -3,7 +3,7 @@ import { Documento } from '@/types/Documento';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DownloadIcon, FileText, X } from 'lucide-react';
+import { DownloadIcon, FileText, X, ArrowLeft } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import {
   Dialog,
@@ -12,12 +12,15 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Link } from '@inertiajs/react'; // asegúrate de tenerlo importado
 
 type Props = {
   documentos: Documento[];
+  formularioId: number | string; // Asegúrate de que el tipo coincida con el id que usas
 };
 
-const Documentos: React.FC<Props> = ({ documentos }) => {
+
+const Documentos: React.FC<Props> = ({ documentos, formularioId }) => {
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   console.log(documentos);
@@ -34,10 +37,20 @@ const Documentos: React.FC<Props> = ({ documentos }) => {
   const downloadDocument = (url: string) => {
     window.open(`/storage/${url}`, '_blank');
   };
+  
 
   return (
     <AppLayout>
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <div className="mb-2">
+  <Button variant="ghost" size="sm" asChild>
+    <Link href={`/formularios-medicos/${formularioId}`}>
+      <ArrowLeft className="mr-1 h-4 w-4" />
+      Volver al formulario
+    </Link>
+  </Button>
+</div>
+
         <h1 className="text-2xl font-bold tracking-tight mb-6">Documentos</h1>
         
         {documentos.length === 0 ? (
