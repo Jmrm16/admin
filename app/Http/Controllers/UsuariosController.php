@@ -14,16 +14,24 @@ class UsuariosController extends Controller
     // ========================
     // INDEX - CLIENTES
     // ========================
-    public function index()
-    {
-        $usuarios = User::where('role', 'cliente')
-            ->select('id', 'name', 'email')
-            ->get();
+public function index()
+{
+    $usuarios = User::where('role', 'cliente')
+        ->select('id', 'name', 'email', 'created_at')
+        ->paginate(10); // o el número que desees
 
-        return Inertia::render('Usuarios/Index', [
-            'usuarios' => $usuarios,
-        ]);
-    }
+    return Inertia::render('Usuarios/Index', [
+        'usuarios' => $usuarios->items(), // solo los usuarios
+        'pagination' => [
+            'current_page' => $usuarios->currentPage(),
+            'last_page' => $usuarios->lastPage(),
+            'per_page' => $usuarios->perPage(),
+            'total' => $usuarios->total(),
+            'links' => $usuarios->linkCollection(),
+        ],
+    ]);
+}
+
 
     // ========================
     // INDEX - ADMINISTRADORES

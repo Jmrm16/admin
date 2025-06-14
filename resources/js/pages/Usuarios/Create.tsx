@@ -11,6 +11,8 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 interface CreateProps {
   open: boolean;
@@ -31,81 +33,125 @@ export default function Create({ open, onOpenChange }: CreateProps) {
     post('/usuarios', {
       onSuccess: () => {
         reset();
-        onOpenChange(false); // cerrar modal
+        onOpenChange(false);
       },
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-[475px]">
         <DialogHeader>
-          <DialogTitle>Crear Usuario</DialogTitle>
-          <DialogDescription>
-            Llena la información para registrar un nuevo usuario.
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+            Crear Nuevo Usuario
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 dark:text-gray-400">
+            Complete todos los campos para registrar un nuevo usuario en el sistema.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Nombre</Label>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Nombre Completo
+            </Label>
             <Input
               id="name"
               value={data.name}
               onChange={(e) => setData('name', e.target.value)}
+              className="focus-visible:ring-2 focus-visible:ring-primary"
+              placeholder="Ej: Juan Pérez"
             />
-            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="email">Correo Electrónico</Label>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Correo Electrónico
+            </Label>
             <Input
               id="email"
               type="email"
               value={data.email}
               onChange={(e) => setData('email', e.target.value)}
+              className="focus-visible:ring-2 focus-visible:ring-primary"
+              placeholder="Ej: usuario@ejemplo.com"
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              value={data.password}
-              onChange={(e) => setData('password', e.target.value)}
-            />
-            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={data.password}
+                onChange={(e) => setData('password', e.target.value)}
+                className="focus-visible:ring-2 focus-visible:ring-primary"
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password_confirmation" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Confirmar Contraseña
+              </Label>
+              <Input
+                id="password_confirmation"
+                type="password"
+                value={data.password_confirmation}
+                onChange={(e) => setData('password_confirmation', e.target.value)}
+                className="focus-visible:ring-2 focus-visible:ring-primary"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
-            <Input
-              id="password_confirmation"
-              type="password"
-              value={data.password_confirmation}
-              onChange={(e) => setData('password_confirmation', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="role">Rol</Label>
-            <select
-              id="role"
+          <div className="space-y-2">
+            <Label htmlFor="role" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Rol del Usuario
+            </Label>
+            <Select
               value={data.role}
-              onChange={(e) => setData('role', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-slate-800 dark:text-white"
+              onValueChange={(value) => setData('role', value)}
             >
-              <option value="cliente">Cliente</option>
-              <option value="admin">Administrador</option>
-            </select>
-            {errors.role && <p className="text-sm text-red-500">{errors.role}</p>}
+              <SelectTrigger className="w-full focus:ring-2 focus:ring-primary">
+                <SelectValue placeholder="Seleccione un rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cliente">Cliente</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.role && <p className="text-sm text-red-500 mt-1">{errors.role}</p>}
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="submit" disabled={processing}>
-              Crear Usuario
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="mr-2"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={processing}
+              className="bg-primary hover:bg-primary-dark"
+            >
+              {processing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creando...
+                </>
+              ) : (
+                'Crear Usuario'
+              )}
             </Button>
           </DialogFooter>
         </form>
