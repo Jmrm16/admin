@@ -84,6 +84,25 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
   ];
   
   const faseActualIndex = fases.findIndex((f) => f.id === formularioData.estado);
+interface GetPublicUrlFn {
+  (ruta: string): string;
+}
+
+const BASE_URL = "https://admin.ipwseguros.com.co";
+
+const getPublicUrl: GetPublicUrlFn = (ruta) => {
+  if (!ruta) return '';
+  // Si ya es una URL absoluta, no la cambies
+  if (ruta.startsWith('http://') || ruta.startsWith('https://')) return ruta;
+  // Si ya empieza con /storage/, antepone el dominio
+  if (ruta.startsWith('/storage/')) return `${BASE_URL}${ruta}`;
+  // Si empieza con app/public/, arma la ruta con storage + dominio
+  if (ruta.startsWith('app/public/')) {
+    return `${BASE_URL}/storage/${ruta}`; // OJO: así queda con el app/public
+  }
+  // Por si acaso, antepone storage
+  return `${BASE_URL}/storage/${ruta}`;
+};
 
   const handleAgregarObservacion = async (fase: string) => {
     if (!nuevaObservacion.trim()) return;
@@ -209,9 +228,19 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                 Documentos
               </Link>
             </Button>
+              <Button variant="outline" size="sm" asChild>
+            <Link href={`/formularios-medicos/${formulario.id}/edit`}>
+              <Shield className="mr-2 h-4 w-4" />
+              Editar
+            </Link>
+          </Button>
             <Button variant="outline" size="sm" onClick={() => window.open(`/pdf/ver2/${formulario.id}`, '_blank')}>
               <DownloadIcon className="mr-2 h-4 w-4" />
               SARLAFT
+            </Button>
+              <Button variant="outline" size="sm" onClick={() => window.open(`/pdf/ver3/${formulario.id}`, '_blank')}>
+              <DownloadIcon className="mr-2 h-4 w-4" />
+              OFICIO
             </Button>
             <Button variant="outline" size="sm" onClick={() => window.open(`/pdf/ver/${formulario.id}`, '_blank')}>
               <DownloadIcon className="mr-2 h-4 w-4" />
@@ -322,7 +351,8 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                           </a>
                         </div>
                       )}
-                    </CardContent>
+                    </CardContent> 
+                    
                   </Card>
 
                   <FaseContent
@@ -354,7 +384,7 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                       {formularioData.constancia_pago_path ? (
                         formularioData.constancia_pago_path.endsWith('.pdf') ? (
                           <a
-                            href={formularioData.constancia_pago_path}
+                            href={getPublicUrl(formularioData.constancia_pago_path)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 underline"
@@ -363,7 +393,7 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                           </a>
                         ) : (
                           <img
-                            src={formularioData.constancia_pago_path}
+                            src={getPublicUrl(formularioData.constancia_pago_path)}
                             alt="Constancia de pago"
                             className="block mx-auto rounded border shadow max-w-md max-h-[700px] object-contain"
                           />
@@ -475,7 +505,7 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                         <div className="mt-4">
                           {formularioData.poliza_path.endsWith('.pdf') ? (
                             <a
-                              href={formularioData.poliza_path}
+                              href={getPublicUrl(formularioData.poliza_path)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 underline"
@@ -484,12 +514,13 @@ export default function FormularioShow({ formulario }: { formulario: Formulario 
                             </a>
                           ) : (
                             <img
-                              src={formularioData.poliza_path}
+                              src={getPublicUrl(formularioData.poliza_path)}
                               alt="Póliza"
                               className="block mx-auto rounded border shadow max-w-md max-h-[700px] object-contain"
                             />
                           )}
                         </div>
+
                       )}
                     </CardContent>
                   </Card>

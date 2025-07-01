@@ -187,6 +187,21 @@ public function subirPoliza(Request $request, $id)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+public function edit(FormulariosMedicos $formularioMedico)
+{
+    return Inertia::render('FormulariosMedicos/Editar', [
+        'formulario' => $formularioMedico
+    ]);
+}
+
+public function update(Request $request, FormulariosMedicos $formularioMedico)
+{
+    $data = $request->all();
+    $formularioMedico->update($data);
+
+    return redirect()->route('formularios.edit', $formularioMedico->id);
+
+}
 
 
 

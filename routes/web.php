@@ -72,14 +72,23 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('/formularios-medicos/{id}/observaciones', [ObservacionesController::class, 'store'])->name('observaciones.store');
     Route::post('/formularios-medicos/{id}/proceso-pago', [FormularioMedicoController::class, 'guardarPago']);
     Route::post('/formularios-medicos/{id}/comprobante-pago', [FormularioMedicoController::class, 'subirComprobantePago']);
+    Route::get('/formularios-medicos/{formularioMedico}/edit', [FormularioMedicoController::class, 'edit'])->name('formularios.edit');
+    Route::put('/formularios-medicos/{formularioMedico}', [FormularioMedicoController::class, 'update'])->name('formularios-medicos.update');
+
+
 
     // Documentos
     Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
+    Route::get('/documentos/{formularioId}', [DocumentosController::class, 'index'])->name('documentos.index');
+
     Route::get('/documentos/descargar/{id}', [DocumentosController::class, 'descargar'])->name('documentos.descargar');
 
     // PDF
     Route::get('/pdf/ver/{id}', [PDFController::class, 'verPDF']);
     Route::get('/pdf/ver2/{id}', [PDFController::class, 'llenarPDF2']);
+    Route::get('/pdf/ver3/{id}', [PDFController::class, 'llenarPDF3']);
+
+
 
     // WhatsApp CRM
     Route::get('/whatsapp', [WhatsappChatController::class, 'index'])->name('whatsapp.index');

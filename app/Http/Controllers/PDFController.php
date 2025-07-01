@@ -1200,6 +1200,76 @@ $pdf->SetFont('Helvetica', '', 8);
 
 
     }
+        public function llenarPDF3($id)
+    {
+        $formulario = FormulariosMedicos::findOrFail($id);
 
 
+        $pdf = new Fpdi();
+        $pdfPath = public_path('Oficio.pdf');
+        $pageCount = $pdf->setSourceFile($pdfPath);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetAutoPageBreak(false, 0);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+
+        // Obtener el número total de páginas del PDF original
+        $pageCount = $pdf->setSourceFile($pdfPath);
+
+        // Iterar sobre cada página del PDF
+        for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
+            $pdf->AddPage();
+            $tplIdx = $pdf->importPage($pageNumber);
+            $pdf->useTemplate($tplIdx, 0, 0, 210, 297, true);
+            $pdf->SetFont('Helvetica', '', 11);
+
+            // Agregar texto en la primera página
+            if ($pageNumber == 1) {
+                Carbon::setLocale('es');
+
+                // Preparar ciudad y fecha en un solo texto
+                $ciudad = $formulario->ciudad ?? '';
+                $fecha = 'Fecha no válida';
+
+                if (!empty($formulario->fecha)) {
+                    try {
+                        $fechaCarbon = Carbon::parse($formulario->fecha);
+                        $fecha = $fechaCarbon->translatedFormat('d \d\e F \d\e Y');
+                    } catch (\Exception $e) {
+                        $fecha = 'Error: ' . $e->getMessage();
+                    }
+                }
+
+                // Ejemplo: "Maicao, 27 de junio de 2025"
+                $ciudadFecha = trim($ciudad . ', ' . $fecha);
+
+                // Ubicación y escritura (ajusta SetXY si es necesario)
+                $pdf->SetXY(28, 32);
+                $pdf->Cell(0, 10, $ciudadFecha, 0, 1);
+
+                $pdf->SetFont('Helvetica', '', 14);
+
+
+                // Datos del formulario
+                $pdf->SetXY(28, 240);
+                $pdf->Cell(0, 10, $formulario->nombres . ' ' . $formulario->primer_apellido . ' ' . $formulario->segundo_apellido, 0, 1);
+                $pdf->SetXY(28, 246.5);
+                $pdf->Cell(0, 10, "{$formulario->tipo_documento}{$formulario->numero_identificacion}", 0, 1);
+                
+   
+                
+
+
+            }
+        }
+                    return response()->stream(function () use ($pdf) {
+                    $pdf->Output('formulario.pdf', 'I');
+                }, 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="formulario.pdf"',
+                ]);
+    }
 }
+
+
+

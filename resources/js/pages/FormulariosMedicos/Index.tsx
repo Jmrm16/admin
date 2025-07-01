@@ -6,13 +6,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
 
+interface User {
+  name: string;
+  email: string;
+  // otros campos que tenga el user
+}
+
+interface Admin {
+  name: string;
+}
+
 interface Formulario {
   id: number;
-  primer_apellido: string;
-  segundo_apellido: string;
-  nombres: string;
   estado: string;
-  admin: { name: string };
+  user?: User;    // 👈 Relación user
+  admin?: Admin;  // 👈 Relación admin
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,6 +31,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function FormulariosIndex({ formularios }: { formularios: any }) {
+  // Asegúrate de que data tiene user
   const formulariosData = Array.isArray(formularios?.data)
     ? formularios.data.filter((f: any) => f.id != null)
     : [];
@@ -31,8 +40,6 @@ export default function FormulariosIndex({ formularios }: { formularios: any }) 
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Mis Formularios" />
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-       
-
         <div className=" relative flex-1 overflow-hidden rounded-xl border p-4">
           <div className="relative z-10">
             <h1 className="text-2xl font-bold mb-4">Listado de Formularios Asignados</h1>
@@ -49,13 +56,17 @@ export default function FormulariosIndex({ formularios }: { formularios: any }) 
               <TableBody>
                 {formulariosData.map((formulario: Formulario) => (
                   <TableRow key={formulario.id}>
-                    <TableCell>{formulario.primer_apellido} {formulario.segundo_apellido} {formulario.nombres}</TableCell>
+                    <TableCell>
+                      {formulario.user?.name || 'Sin usuario'}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={formulario.estado === 'finalizado' ? 'default' : 'secondary'}>
                         {formulario.estado}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formulario.admin?.name || 'No disponible'}</TableCell>
+                    <TableCell>
+                      {formulario.admin?.name || 'No disponible'}
+                    </TableCell>
                     <TableCell>
                       <Link href={`/formularios-medicos/${formulario.id}`}>
                         <Button variant="outline" size="sm">Ver detalles</Button>
