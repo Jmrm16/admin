@@ -95,6 +95,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/whatsapp/clientes/{id}/mensajes', [WhatsappChatController::class, 'mensajes'])->name('whatsapp.mensajes');
     Route::post('/whatsapp/enviar', [WhatsappChatController::class, 'enviar'])->name('whatsapp.enviar');
     Route::get('/whatsapp/enviar', [WhatsappController::class, 'enviarMensaje']);
+
+
+        // Eventos
+    Route::get('/eventos', [\App\Http\Controllers\EventoController::class, 'index'])->name('eventos.index');
+    Route::get('/eventos/crear', [\App\Http\Controllers\EventoController::class, 'create'])->name('eventos.create');
+    Route::post('/eventos', [\App\Http\Controllers\EventoController::class, 'store'])->name('eventos.store');
+    Route::post('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update']);
+    Route::get('/eventos/{evento}/editar', [\App\Http\Controllers\EventoController::class, 'edit'])->name('eventos.edit');
+    Route::put('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'update'])->name('eventos.update');
+    Route::delete('/eventos/{evento}', [\App\Http\Controllers\EventoController::class, 'destroy'])->name('eventos.destroy');
+
 });
 
 // Otros settings y auth

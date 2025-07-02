@@ -35,7 +35,12 @@ const mainNavItems: NavItem[] = [
   title: 'Administradores',
   href: '/usuarios/admins',
   icon: User2Icon, // puedes usar otro como `ShieldIcon` si deseas distinguirlo
-}
+},
+{
+  title: 'Eventos',
+  href: '/eventos',
+  icon: Folder, // puedes cambiar por otro icono si prefieres
+},
 
     
     
