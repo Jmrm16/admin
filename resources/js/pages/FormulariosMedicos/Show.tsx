@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
+import { Inertia } from '@inertiajs/inertia';
+import { Method } from '@inertiajs/inertia'; // 👈 Importa como valor
 import AppLayout from '@/layouts/app-layout';
 import {
   Card, CardHeader, CardTitle, CardContent, CardFooter
@@ -199,6 +201,7 @@ const getPublicUrl: GetPublicUrlFn = (ruta) => {
     }
   };
 
+
   return (
     <AppLayout>
       <Head title={`Formulario Médico - ${formulario.id}`} />
@@ -222,12 +225,26 @@ const getPublicUrl: GetPublicUrlFn = (ruta) => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/documentos/${formulario.user_id}`}>
-                <DownloadIcon className="mr-2 h-4 w-4" />
-                Documentos
-              </Link>
-            </Button>
+<Button
+  variant="outline"
+  size="sm"
+  onClick={() =>
+    Inertia.visit(`/documentos/${formulario.user_id}`, {
+      data: {
+        formulario_medico_id: formulario.id,
+        from: `/formularios-medicos/${formulario.id}`,
+      },
+      method: Method.GET,
+      preserveScroll: true,
+    })
+  }
+>
+  <DownloadIcon className="mr-2 h-4 w-4" />
+  Documentos
+</Button>
+
+
+
               <Button variant="outline" size="sm" asChild>
             <Link href={`/formularios-medicos/${formulario.id}/edit`}>
               <Shield className="mr-2 h-4 w-4" />

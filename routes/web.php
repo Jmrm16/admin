@@ -82,6 +82,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/documentos/{formularioId}', [DocumentosController::class, 'index'])->name('documentos.index');
 
     Route::get('/documentos/descargar/{id}', [DocumentosController::class, 'descargar'])->name('documentos.descargar');
+    // Documentos (sin prefijo 'admin')
+Route::get('/documentos/{userId}', [DocumentosController::class, 'index'])->name('documentos.index');
+Route::post('/documentos/{userId}', [DocumentosController::class, 'store'])->name('documentos.store');
+Route::delete('/documentos/eliminar/{id}', [DocumentosController::class, 'destroy'])->name('documentos.destroy');
+
+
 
     // PDF
     Route::get('/pdf/ver/{id}', [PDFController::class, 'verPDF']);

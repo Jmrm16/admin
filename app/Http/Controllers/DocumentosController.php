@@ -3,71 +3,120 @@
 namespace App\Http\Controllers;
 
 use App\Models\Documentos;
+use App\Models\FormulariosMedicos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class DocumentosController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostrar lista de documentos de un usuario
      */
-public function index($formularioId)
+public function index(Request $request, $userId)
 {
-    // Trae los documentos solo de ese formulario
-    $documentos = Documentos::where('formulario_medico_id', $formularioId)->get();
+    $formularioId = $request->query('formulario_medico_id');
+
+    $tiposFormulario = ['formulario_sarlaft', 'formulario_medico', 'formulario_oficio'];
+
+    // 1. Documentos generales (por usuario)
+    $documentosGenerales = Documentos::where('user_id', $userId)
+        ->whereNotIn('tipo', $tiposFormulario)
+        ->get();
+
+    // 2. Documentos especiales (solo por formulario_id, NO por user_id)
+    $documentosFormulario = collect();
+    if ($formularioId) {
+        $documentosFormulario = Documentos::whereIn('tipo', $tiposFormulario)
+            ->where('formulario_medico_id', $formularioId)
+            ->get();
+    }
+
+    // Combinar ambos
+    $documentos = $documentosGenerales->merge($documentosFormulario);
 
     return Inertia::render('FormulariosMedicos/Documentos', [
         'documentos' => $documentos,
+        'userId' => $userId,
         'formularioId' => $formularioId,
     ]);
 }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
-     * Store a newly created resource in storage.
+     * Guardar o reemplazar documento para un usuario específico
      */
-    public function store(Request $request)
-    {
-        //
+public function store(Request $request, $userId)
+{
+    $tiposConFormulario = ['formulario_sarlaft', 'formulario_medico', 'formulario_oficio'];
+
+    $request->validate([
+        'tipo' => 'required|string',
+        'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'formulario_medico_id' => [
+            function ($attribute, $value, $fail) use ($request, $tiposConFormulario) {
+                if (in_array($request->tipo, $tiposConFormulario) && !$value) {
+                    $fail("El campo formulario_medico_id es obligatorio para el tipo {$request->tipo}.");
+                }
+            },
+        ],
+    ]);
+
+    $tipo = $request->tipo;
+    $archivo = $request->file('archivo');
+    $nombre = time() . '_' . $archivo->getClientOriginalName();
+    $ruta = $archivo->storeAs("documentos_usuario/{$userId}", $nombre, 'public');
+
+    $formularioId = in_array($tipo, $tiposConFormulario) ? $request->formulario_medico_id : null;
+
+    $query = Documentos::where('user_id', $userId)->where('tipo', $tipo);
+    if ($formularioId) {
+        $query->where('formulario_medico_id', $formularioId);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Documentos $documentos)
-    {
-        //
+    $documento = $query->first();
+
+    if ($documento) {
+        if (Storage::disk('public')->exists(str_replace('app/public/', '', $documento->archivo))) {
+            Storage::disk('public')->delete(str_replace('app/public/', '', $documento->archivo));
+        }
+
+        $documento->update([
+            'archivo' => "app/public/{$ruta}",
+            'estado' => 'subido',
+            'formulario_medico_id' => $formularioId, // ✅ Agregado
+        ]);
+    } else {
+        Documentos::create([
+            'user_id' => $userId,
+            'formulario_medico_id' => $formularioId,
+            'tipo' => $tipo,
+            'archivo' => "app/public/{$ruta}",
+            'estado' => 'subido',
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Documentos $documentos)
-    {
-        //
-    }
+    return response()->json(['success' => true, 'message' => 'Documento subido correctamente.']);
+}
+
+
+
 
     /**
-     * Update the specified resource in storage.
+     * Eliminar un documento
      */
-    public function update(Request $request, Documentos $documentos)
+    public function destroy($id)
     {
-        //
-    }
+        $documento = Documentos::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Documentos $documentos)
-    {
-        //
+        if (Storage::disk('public')->exists(str_replace('app/public/', '', $documento->archivo))) {
+            Storage::disk('public')->delete(str_replace('app/public/', '', $documento->archivo));
+        }
+
+        $documento->delete();
+
+        return response()->json(['success' => true, 'message' => 'Documento eliminado.']);
     }
 }

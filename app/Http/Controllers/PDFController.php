@@ -41,7 +41,7 @@ $pdf->SetXY(37, 42.5);
 $pdf->Cell(0, 10, $formulario->nombres.' '.$formulario->primer_apellido.' '.$formulario->segundo_apellido, 0, 0, '', false, 1);
 
 $pdf->SetXY(14.5, 50);
-$pdf->Cell(0, 10, $formulario->numero_identificacion, 0, 0, '', false, 1);
+$pdf->Cell(0, 10, number_format($formulario->numero_identificacion, 0, '', '.'), 0, 0, '', false, 1);
 
 $pdf->SetXY(103, 50);
 $pdf->Cell(0, 10, $formulario->direccion . ' - ' . $formulario->ciudad_residencia, 0, 0, '', false, 1);
@@ -58,7 +58,7 @@ $pdf->Cell(0, 10, substr($formulario->fecha_graduacion,0,10), 0, 0, '', false, 1
 
 
 $pdf->SetXY(14.15, 70.5);
-$pdf->Cell(0, 10, $formulario->numero_identificacion, 0, 0, '', false, 1);
+$pdf->Cell(0, 10, number_format($formulario->numero_identificacion, 0, '', '.'), 0, 0, '', false, 1);
 
 $pdf->SetXY(100, 70.5);
 $pdf->Cell(0, 10, $formulario->registro_profecional, 0, 0, '', false, 1);
@@ -407,7 +407,7 @@ $pdf->Cell(0, 10, $valorFormateado, 0, 0, '', false, 1);
                 $pdf->Cell(0, 10, $request->nombres.' '.$request->primer_apellido.' '.$request->segundo_apellido, 0, 0, '', false, 1);
 
                 $pdf->SetXY(14.5, 50);
-                $pdf->Cell(0, 10, $request->numero_identificacion, 0, 0, '', false, 1);
+                $pdf->Cell(0, 10, number_format($request->numero_identificacion, 0, '', '.'), 0, 0, '', false, 1);
 
                 $pdf->SetXY(103, 50);
                 $pdf->Cell(0, 10, $request->direccion . ' - ' . $request->ciudad_residencia, 0, 0, '', false, 1);
@@ -423,7 +423,7 @@ $pdf->Cell(0, 10, $valorFormateado, 0, 0, '', false, 1);
 
                 
                 $pdf->SetXY(14.15, 70.5);
-                $pdf->Cell(0, 10, $request->numero_identificacion, 0, 0, '', false, 1);
+                $pdf->Cell(0, 10, number_format($request->numero_identificacion, 0, '', '.'), 0, 0, '', false, 1);
 
                 $pdf->SetXY(100, 70.5);
                 $pdf->Cell(0, 10, $request->registro_profecional, 0, 0, '', false, 1);
@@ -751,15 +751,13 @@ $pdf->Cell(0, 10, $valorFormateado, 0, 0, '', false, 1);
                 $pdf->SetXY(50, 210);
                 $pdf->Cell(0, 10, $request->sector_actividad, 0, 1);
 
-
-
                 $pdf->SetXY(50, 220);
                 $pdf->Cell(0, 10, $request->ocupacion, 0, 1);
 
                 $pdf->SetXY(50, 230);
                 $pdf->Cell(0, 10, $request->cargo, 0, 1);
 
-                $pdf->SetXY(50, 240);
+                $pdf->SetXY(45, 240);
                 $pdf->Cell(0, 10, $request->empresa, 0, 1);
 
                 $pdf->SetXY(50, 250);
@@ -958,17 +956,17 @@ return redirect()->route('dashboard')->with('success', 'Formulario generado y gu
                     }
                 }
                 
-                $pdf->SetFont('Helvetica', '', 10); // asegúrate de tener una fuente configurada
+                $pdf->SetFont('Helvetica', '', 9); // asegúrate de tener una fuente configurada
                 $pdf->Cell(0, 10, $fecha, 0, 0, '', false, 1);
                 
 
-                $pdf->SetXY(77, 25);
+                $pdf->SetXY(76, 25);
                 $pdf->Cell(0, 10, $formulario->ciudad, 0, 1);
 
                 $pdf->SetXY(118, 25);
                 $pdf->Cell(0, 10, $formulario->sucursal, 0, 1);
 
-                $pdf->SetXY(167, 25);
+                $pdf->SetXY(167, 24);
                 $pdf->Cell(0, 10, $formulario->tipo_solicitud, 0, 1);
 
                 $pdf->SetXY(30, 46.8);
@@ -980,7 +978,8 @@ return redirect()->route('dashboard')->with('success', 'Formulario generado y gu
                 $pdf->SetXY(178, 46.8);
                 $pdf->Cell(0, 10, $formulario->tipo_documento, 0, 1);
                 $pdf->SetXY(19, 53.5);
-                $pdf->Cell(0, 10, $formulario->numero_identificacion, 0, 0, '', false, 1);
+                $pdf->Cell(0, 10, number_format($formulario->numero_identificacion, 0, '', '.'), 0, 0, '', false, 1);
+
                 $pdf->SetXY(73.5, 53.5);
                 $pdf->Cell(0, 10, substr($formulario->fecha_expedicion, 0, 10), 0, 0, '', false, 1);
                 $pdf->SetXY(117, 53.5);
@@ -991,41 +990,54 @@ return redirect()->route('dashboard')->with('success', 'Formulario generado y gu
                 $pdf->Cell(0, 10, $formulario->nacionalidad_1, 0, 0, '', false, 1);
                 $pdf->SetXY(92, 60.5);
                 $pdf->Cell(0, 10, $formulario->nacionalidad_2, 0, 0, '', false, 1);
-                $pdf->SetXY(150, 60.5);
+                  $pdf->SetFont('Helvetica', '', 7.7);
+                $pdf->SetXY(147, 60.5);
                 $pdf->Cell(0, 10, $formulario->email, 0, 0, '', false, 1);
+              
 
-                $pdf->SetXY(32, 67);
+                $pdf->SetXY(30, 67);
                 $pdf->Cell(0, 10, $formulario->lugar_nacimiento, 0, 0, '', false, 1);
                 $pdf->SetXY(105, 67);
                 $pdf->Cell(0, 10, $formulario->celular, 0, 0, '', false, 1);
-                $pdf->SetXY(158, 67);
-                $pdf->Cell(0, 10, $formulario->direccion . ' - ' . $formulario->ciudad_residencia, 0, 0, '', false, 1);
+                $pdf->SetXY(156, 67);
+                $pdf->Cell(0, 10, $formulario->direccion, 0, 0, '', false, 1);
 
-                $pdf->SetXY(20, 74);
+                $pdf->SetXY(17.5, 74);
                 $pdf->Cell(0, 10, $formulario->ciudad_residencia, 0, 0, '', false, 1);
                 $pdf->SetXY(68, 74);
                 $pdf->Cell(0, 10, $formulario->departamento, 0, 0, '', false, 1);
-                $pdf->SetXY(125, 74);
+                $pdf->SetXY(123, 74);
                 $pdf->Cell(0, 10, $formulario->actividad_principal, 0, 0, '', false, 1);
 
-                $pdf->SetXY(179, 74);
+                $pdf->SetXY(177, 74);
                 $pdf->Cell(0, 10, $formulario->codigo_ciiu, 0, 0, '', false, 1);
 
-                $pdf->SetXY(38, 82);
+                $pdf->SetXY(37, 82);
                 $pdf->Cell(0, 10, $formulario->sector_actividad, 0, 0, '', false, 1);
 
                 $pdf->SetXY(82, 82);
                 $pdf->Cell(0, 10, $formulario->cual, 0, 0, '', false, 1);
+                $pdf->SetFont('Helvetica', '', 8);
 
-                $pdf->SetXY(135, 82);
+                $pdf->SetXY(132.5, 82);
                 $pdf->Cell(0, 10, $formulario->ocupacion, 0, 0, '', false, 1);
-                $pdf->SetXY(172, 82);
+                $pdf->SetXY(168.7, 82);
                 $pdf->Cell(0, 10, $formulario->cargo, 0, 0, '', false, 1);
-                $pdf->SetXY(20, 88);
-                $pdf->Cell(0, 10, $formulario->empresa, 0, 0, '', false, 1);
+              
+ 
+                $texto = $formulario->empresa;
+                $max_length = 18; // Máximo de caracteres
+                if (strlen($texto) > $max_length) {
+                    $texto = substr($texto, 0, $max_length) . '...'; // Recorta y añade puntos suspensivos
+                    
+              }
+                $pdf->SetFont('Helvetica', '', 8);
+                $pdf->SetXY(18.5, 88);
+                $pdf->Cell(0, 10, $texto, 0, 0, 'L');
+                
                 $pdf->SetXY(70, 88);
                 $pdf->Cell(0, 10, $formulario->direccion_empresa, 0, 0, '', false, 1);
-                $pdf->SetXY(121, 88);
+                $pdf->SetXY(120, 88);
                 $pdf->Cell(0, 10, $formulario->ciudad_empresa, 0, 0, '', false, 1);
                 $pdf->SetXY(167, 88);
                 $pdf->Cell(0, 10, $formulario->departamento_empresa, 0, 0, '', false, 1);
@@ -1033,6 +1045,11 @@ return redirect()->route('dashboard')->with('success', 'Formulario generado y gu
 
                 $pdf->SetXY(28, 95);
                 $pdf->Cell(0, 10, $formulario->telefono_empresa, 0, 0, '', false, 1);
+                
+                $pdf->SetXY(132, 95);
+                $pdf->Cell(0, 10, $formulario->producto_servicio, 0, 0, '', false, 1);
+                
+
                 function parseMoneda($valor)
                {
                return '$' . number_format((int) preg_replace('/[^0-9]/', '', $valor), 0, ',', '.');
@@ -1195,12 +1212,8 @@ $pdf->SetFont('Helvetica', '', 8);
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'inline; filename="formulario.pdf"',
                 ]);
-
-
-
-
     }
-        public function llenarPDF3($id)
+            public function llenarPDF3($id)
     {
         $formulario = FormulariosMedicos::findOrFail($id);
 
@@ -1254,10 +1267,7 @@ $pdf->SetFont('Helvetica', '', 8);
                 $pdf->SetXY(28, 240);
                 $pdf->Cell(0, 10, $formulario->nombres . ' ' . $formulario->primer_apellido . ' ' . $formulario->segundo_apellido, 0, 1);
                 $pdf->SetXY(28, 246.5);
-                $pdf->Cell(0, 10, "{$formulario->tipo_documento}{$formulario->numero_identificacion}", 0, 1);
-                
-   
-                
+                $pdf->Cell(0, 10, "{$formulario->tipo_documento}" . number_format($formulario->numero_identificacion, 0, '', '.'), 0, 1);
 
 
             }
@@ -1269,7 +1279,6 @@ $pdf->SetFont('Helvetica', '', 8);
                     'Content-Disposition' => 'inline; filename="formulario.pdf"',
                 ]);
     }
+
+
 }
-
-
-

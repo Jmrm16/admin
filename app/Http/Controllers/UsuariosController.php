@@ -7,6 +7,7 @@ use App\Models\FormulariosMedicos;
 use App\Models\Notificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UsuariosController extends Controller
@@ -16,21 +17,24 @@ class UsuariosController extends Controller
     // ========================
 public function index()
 {
-    $usuarios = User::where('role', 'cliente')
+    // 1. Solo los campos que necesitas
+    $usuarios = DB::table('users')
+        ->where('role', 'cliente')
         ->select('id', 'name', 'email', 'created_at')
-        ->paginate(10); // o el número que desees
+        ->orderByDesc('created_at')
+        //->limit(1000) // Descomenta si tienes MUCHOS usuarios
+        ->get();
+
+    // 2. Convierte a array simple (más rápido que Eloquent Collection)
+    $usuarios = json_decode(json_encode($usuarios), true);
 
     return Inertia::render('Usuarios/Index', [
-        'usuarios' => $usuarios->items(), // solo los usuarios
-        'pagination' => [
-            'current_page' => $usuarios->currentPage(),
-            'last_page' => $usuarios->lastPage(),
-            'per_page' => $usuarios->perPage(),
-            'total' => $usuarios->total(),
-            'links' => $usuarios->linkCollection(),
-        ],
+        'usuarios' => $usuarios,
     ]);
 }
+
+
+
 
 
     // ========================
@@ -50,41 +54,45 @@ public function index()
     // ========================
     // SHOW - PERFIL DE USUARIO
     // ========================
-    public function show($id)
-    {
-        $usuario = User::findOrFail($id);
+// ========================
+// SHOW - PERFIL DE USUARIO
+// ========================
+public function show($id)
+{
+    $usuario = User::findOrFail($id);
 
-        if ($usuario->role === 'admin') {
-            // Admin: obtener formularios asignados
-            $formularios = FormulariosMedicos::where('admin_id', $usuario->id)
-                ->with('user:id,name,email')
+    if ($usuario->role === 'admin') {
+        // Admin: obtener formularios asignados
+        $formularios = FormulariosMedicos::where('admin_id', $usuario->id)
+            ->with(['user:id,name,email', 'admin:id,name']) // Agregar relación con admin
+            ->select([
+                'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
+                'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
+                'created_at', 'tipo_proceso', 'admin_id'
+            ])
+            ->latest()
+            ->get();
+    } else {
+        // Cliente: usar relación definida con eager loading para admin
+        $usuario->load(['formulariosMedicos' => function ($query) {
+            $query->with(['admin:id,name']) // Agregar relación con admin
                 ->select([
                     'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
                     'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
                     'created_at', 'tipo_proceso', 'admin_id'
                 ])
-                ->latest()
-                ->get();
-        } else {
-            // Cliente: usar relación definida
-            $usuario->load(['formulariosMedicos' => function ($query) {
-                $query->select([
-                    'id', 'user_id', 'fecha', 'sucursal', 'ciudad', 'tipo_solicitud',
-                    'primer_apellido', 'segundo_apellido', 'nombres', 'pdf_path', 'estado',
-                    'created_at', 'tipo_proceso', 'admin_id'
-                ])->latest();
-            }]);
+                ->latest();
+        }]);
 
-            $formularios = $usuario->formulariosMedicos;
-        }
-
-        return Inertia::render('Usuarios/Profile', [
-            'usuario' => $usuario,
-            'formularios' => $formularios,
-            'esAdmin' => $usuario->role === 'admin',
-        ]);
+        $formularios = $usuario->formulariosMedicos;
     }
 
+    return Inertia::render('Usuarios/Profile', [
+        'usuario' => $usuario,
+        'formularios' => $formularios,
+        'esAdmin' => $usuario->role === 'admin',
+    ]);
+}
     // ========================
     // PERFIL DE ADMINISTRADOR
     // ========================
