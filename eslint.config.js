@@ -7,6 +7,18 @@ import typescript from 'typescript-eslint';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+    {
+        ignores: [
+            'vendor/**',
+            'node_modules/**',
+            'public/**',
+            'bootstrap/ssr/**',
+            'tailwind.config.js',
+            'resources/js/ziggy.js',
+            'resources/js/ziggy.d.ts',
+            '**/*.d.ts',
+        ],
+    },
     js.configs.recommended,
     ...typescript.configs.recommended,
     {
@@ -38,7 +50,18 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+        files: ['**/*.ts', '**/*.tsx'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
+        },
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

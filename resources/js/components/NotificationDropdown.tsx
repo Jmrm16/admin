@@ -50,8 +50,6 @@ export function NotificationDropdown() {
 
       if (notificacion.data?.user_id) {
         router.get(`/usuarios/${notificacion.data.user_id}`);
-      } else if (notificacion.data?.user_id) {
-        
       }
     } catch (error) {
       console.error("❌ Error al marcar como leída o redirigir:", error);
