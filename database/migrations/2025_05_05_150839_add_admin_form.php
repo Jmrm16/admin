@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('formularios_medicos', function (Blueprint $table) {
-            $table->unsignedBigInteger('admin_id')->nullable()->after('user_id');
-            $table->foreign('admin_id')->references('id')->on('users')->onDelete('set null');
-        });
-        
+        if (Schema::hasTable('formularios_medicos') && ! Schema::hasColumn('formularios_medicos', 'admin_id')) {
+            Schema::table('formularios_medicos', function (Blueprint $table) {
+                $table->unsignedBigInteger('admin_id')->nullable()->after('user_id');
+                $table->foreign('admin_id')->references('id')->on('users')->onDelete('set null');
+            });
+        }
     }
 
     /**

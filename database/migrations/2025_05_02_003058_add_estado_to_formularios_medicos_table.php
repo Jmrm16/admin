@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('formularios_medicos', function (Blueprint $table) {
-            $table->string('estado')->default('pendiente'); // otros posibles: en_proceso, aprobado, rechazado
-        });
+        if (Schema::hasTable('formularios_medicos') && ! Schema::hasColumn('formularios_medicos', 'estado')) {
+            Schema::table('formularios_medicos', function (Blueprint $table) {
+                $table->string('estado')->default('pendiente'); // otros posibles: en_proceso, aprobado, rechazado
+            });
+        }
     }
-    
+
     public function down()
     {
         Schema::table('formularios_medicos', function (Blueprint $table) {

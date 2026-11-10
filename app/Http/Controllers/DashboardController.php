@@ -4,9 +4,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\FormulariosMedicos;
 use App\Models\Notificacion;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -28,7 +28,8 @@ class DashboardController extends Controller
             ->get()
             ->toArray();
 
-        $porMes = FormulariosMedicos::selectRaw('DATE_FORMAT(fecha, "%Y-%m") as mes, COUNT(*) as total')
+        $dateFormat = DB::getDriverName() === 'sqlite' ? "strftime('%Y-%m', fecha)" : 'DATE_FORMAT(fecha, "%Y-%m")';
+        $porMes = FormulariosMedicos::selectRaw("{$dateFormat} as mes, COUNT(*) as total")
             ->groupBy('mes')
             ->orderBy('mes')
             ->get();
